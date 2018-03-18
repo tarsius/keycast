@@ -225,7 +225,7 @@ instead."
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
 
-;; _
+;;; _
 (provide 'keycast)
 ;; Local Variables:
 ;; indent-tabs-mode: nil
