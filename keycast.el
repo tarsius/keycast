@@ -175,7 +175,7 @@ instead."
                (setq keycast--removed-tail (cdr cons))
                (setcdr cons (list 'mode-line-keycast)))
               (t
-               (push 'mode-line-keycast cons))))
+               (setcdr cons (cons 'mode-line-keycast (cdr cons))))))
     (let ((cons (memq 'mode-line-keycast mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
