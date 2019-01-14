@@ -132,10 +132,16 @@ instead."
 
 (defface keycast-key
   '((t (:weight bold
-        :height 1.2
-        :background "#d5cfbf"
-        :foreground "#000000"
-	:box (:line-width -3 :style released-button))))
+                :height 1.2
+                :background "#d5cfbf"
+                :foreground "#000000"
+                :box (:line-width -3 :style released-button))))
+  "When Keycast mode is enabled, face used for the key in the mode line."
+  :group 'keycast)
+
+(defface keycast-toggle
+  '((t (:inherit keycast-key
+                 :background "#bbb5a7")))
   "When Keycast mode is enabled, face used for the key in the mode line."
   :group 'keycast)
 
@@ -147,12 +153,18 @@ instead."
 
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
+(defvar keycast--current-face 'keycast-key)
 
 (defun keycast-mode-line-update ()
   "Update mode line with current `this-command' and `this-command-keys'."
   ;; Remember these values because the mode line update won't actually
   ;; happen until we return to the command loop and by that time these
   ;; values have been reset to nil.
+  (setq keycast--current-face
+        (if (eq keycast--current-face
+                'keycast-key)
+            'keycast-toggle
+          'keycast-key))
   (setq keycast--this-command-keys (this-command-keys))
   (setq keycast--this-command this-command)
   (force-mode-line-update t))
@@ -206,6 +218,7 @@ instead."
          (let* ((key (ignore-errors
                        (key-description keycast--this-command-keys)))
                 (cmd keycast--this-command)
+                (face keycast--current-face)
                 (elt (or (assoc cmd keycast-substitute-alist)
                          (assoc key keycast-substitute-alist))))
            (when elt
@@ -218,7 +231,7 @@ instead."
                  (propertize (let ((pad (max 2 (- 5 (length key)))))
                                (concat (make-string (ceiling pad 2) ?\s) key
                                        (make-string (floor   pad 2) ?\s)))
-                             'face 'keycast-key)
+                             'face face)
                  (format " %s" (propertize (symbol-name cmd)
                                            'face 'keycast-command))))))))
 
