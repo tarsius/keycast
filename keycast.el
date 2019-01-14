@@ -94,6 +94,11 @@ with no argument and act on `selected-window'.
   :group 'keycast
   :type 'integer)
 
+(defcustom keycast-count-format "[%s]"
+  "Format used for showing the repeat count."
+  :group 'keycast
+  :type 'string)
+
 (defcustom keycast-substitute-alist nil
   "Alist used to substituted events and/or commands for display.
 
@@ -147,12 +152,17 @@ instead."
 
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
+(defvar keycast--command-count 1)
 
 (defun keycast-mode-line-update ()
   "Update mode line with current `this-command' and `this-command-keys'."
   ;; Remember these values because the mode line update won't actually
   ;; happen until we return to the command loop and by that time these
   ;; values have been reset to nil.
+  (if (eq last-command this-command)
+      (setq keycast--command-count
+            (1+ keycast--command-count))
+    (setq keycast--command-count 1))
   (setq keycast--this-command-keys (this-command-keys))
   (setq keycast--this-command this-command)
   (force-mode-line-update t))
@@ -206,6 +216,11 @@ instead."
          (let* ((key (ignore-errors
                        (key-description keycast--this-command-keys)))
                 (cmd keycast--this-command)
+                (count (if (/= keycast--command-count 1)
+                           (concat " "
+                                   (format keycast-count-format
+                                           keycast--command-count))
+                         ""))
                 (elt (or (assoc cmd keycast-substitute-alist)
                          (assoc key keycast-substitute-alist))))
            (when elt
@@ -219,8 +234,8 @@ instead."
                                (concat (make-string (ceiling pad 2) ?\s) key
                                        (make-string (floor   pad 2) ?\s)))
                              'face 'keycast-key)
-                 (format " %s" (propertize (symbol-name cmd)
-                                           'face 'keycast-command))))))))
+                 (propertize (format " %s%s" (symbol-name cmd) count)
+                             'face 'keycast-command)))))))
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
