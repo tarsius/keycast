@@ -82,8 +82,8 @@ with no argument and act on `selected-window'.
 
 `keycast-active-frame-bottom-right-p'
   Return non-nil if the temporarily selected window is the
-  right-most bottom window of frame that is active as far
-  as the user is concerned.  If neither the `moody' nor
+  right-most bottom window of the frame that is active as
+  far as the user is concerned.  If neither the `moody' nor
   the `powerline' library is loaded, then behave the same
   as `keycast-bottom-right-window-p'."
   :group 'keycast
