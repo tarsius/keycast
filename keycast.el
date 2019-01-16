@@ -1,6 +1,6 @@
 ;;; keycast.el --- Show current command and its key in the mode line  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018  Jonas Bernoulli
+;; Copyright (C) 2018-2019  Jonas Bernoulli
 
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/keycast
@@ -147,9 +147,13 @@ instead."
 
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
+(defvar keycast--command-repetitions 0)
 
 (defun keycast-mode-line-update ()
   "Update mode line with current `this-command' and `this-command-keys'."
+  (if (eq last-command this-command)
+      (cl-incf keycast--command-repetitions)
+    (setq keycast--command-repetitions 0))
   ;; Remember these values because the mode line update won't actually
   ;; happen until we return to the command loop and by that time these
   ;; values have been reset to nil.
@@ -219,8 +223,9 @@ instead."
                                (concat (make-string (ceiling pad 2) ?\s) key
                                        (make-string (floor   pad 2) ?\s)))
                              'face 'keycast-key)
-                 (format " %s" (propertize (symbol-name cmd)
-                                           'face 'keycast-command))))))))
+                 (propertize (format " %s" cmd) 'face 'keycast-command)
+                 (and (> keycast--command-repetitions 0)
+                      (format " x%s" (1+ keycast--command-repetitions)))))))))
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
