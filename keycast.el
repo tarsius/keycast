@@ -173,8 +173,10 @@ instead."
       (let ((cons (member keycast-insert-after mode-line-format)))
         (unless cons
           (setq keycast-mode nil)
-          (user-error "Cannot turn on %s.  %s not found in %s"
-                      'keycast-mode keycast-insert-after 'mode-line-format))
+          (user-error
+           "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
+           'keycast-mode keycast-insert-after 'mode-line-format
+           'keycast-insert-after))
         (cond (keycast-remove-tail-elements
                (setq keycast--removed-tail (cdr cons))
                (setcdr cons (list 'mode-line-keycast)))
