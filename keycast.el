@@ -148,6 +148,7 @@ instead."
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
 (defvar keycast--command-repetitions 0)
+(defvar keycast--reading-passwd nil)
 
 (defun keycast-mode-line-update ()
   "Update mode line with current `this-command' and `this-command-keys'."
@@ -209,6 +210,7 @@ instead."
 (defvar mode-line-keycast
   '(:eval
     (and (funcall keycast-window-predicate)
+         (not keycast--reading-passwd)
          (let* ((key (ignore-errors
                        (key-description keycast--this-command-keys)))
                 (cmd keycast--this-command)
@@ -231,6 +233,12 @@ instead."
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
+
+(defun keycast--read-passwd (fn prompt &optional confirm default)
+  (let ((keycast--reading-passwd t))
+    (funcall fn prompt confirm default)))
+
+(advice-add 'read-passwd :around #'keycast--read-passwd)
 
 ;;; _
 (provide 'keycast)
