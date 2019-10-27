@@ -160,9 +160,7 @@ instead."
   ;; values have been reset to nil.
   (setq keycast--this-command-keys (this-command-keys))
   (setq keycast--this-command this-command)
-  (force-mode-line-update t))
-
-(add-hook 'pre-command-hook 'keycast-mode-line-update t)
+  (force-mode-line-update))
 
 (defvar keycast--removed-tail nil)
 
@@ -182,7 +180,8 @@ instead."
                (setq keycast--removed-tail (cdr cons))
                (setcdr cons (list 'mode-line-keycast)))
               (t
-               (setcdr cons (cons 'mode-line-keycast (cdr cons))))))
+               (setcdr cons (cons 'mode-line-keycast (cdr cons)))))
+        (add-hook 'pre-command-hook 'keycast-mode-line-update t))
     (let ((cons (memq 'mode-line-keycast mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
@@ -190,7 +189,8 @@ instead."
             (t
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
-    (setq keycast--removed-tail nil)))
+    (setq keycast--removed-tail nil)
+    (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
 (defun keycast-bottom-right-window-p ()
   (and (window-at-side-p nil 'right)
