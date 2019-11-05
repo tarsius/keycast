@@ -97,7 +97,7 @@ with no argument and act on `selected-window'.
 (defcustom keycast-substitute-alist nil
   "Alist used to substituted events and/or commands for display.
 
-Occationally it might be necessary to pretend you pressed another
+Occasionally it might be necessary to pretend you pressed another
 key than the one you actually pressed (because watchers don't
 care about your weird key bindings), or to hide certain commands
 \(such as `self-insert-command').  This option allows doing that
