@@ -89,6 +89,19 @@ with no argument and act on `selected-window'.
   :group 'keycast
   :type 'function)
 
+(defcustom mode-line-keycast-format "%s%k%c%r"
+  "The format spec used by `mode-line-keycast'.
+
+%s `keycast-separator-width' spaces.
+%k The key using the `keycast-key' face.
+%K The key with no styling.
+%c The command using the `keycast-command' face.
+%C The command with-no styling.
+%r The times the command was repeated."
+  :package-version '(keycast . "1.0.3")
+  :group 'keycast
+  :type 'integer)
+
 (defcustom keycast-separator-width 10
   "How many spaces to insert before the key binding."
   :group 'keycast
@@ -229,15 +242,20 @@ instead."
                (unless (eq k t) (setq key k))
                (unless (eq c t) (setq cmd c))))
            (and key cmd
-                (concat
-                 (make-string keycast-separator-width ?\s)
-                 (propertize (let ((pad (max 2 (- 5 (length key)))))
-                               (concat (make-string (ceiling pad 2) ?\s) key
-                                       (make-string (floor   pad 2) ?\s)))
-                             'face 'keycast-key)
-                 (propertize (format " %s" cmd) 'face 'keycast-command)
-                 (and (> keycast--command-repetitions 0)
-                      (format " x%s" (1+ keycast--command-repetitions)))))))))
+                (let ((k (let ((pad (max 2 (- 5 (length key)))))
+                           (concat (make-string (ceiling pad 2) ?\s) key
+                                   (make-string (floor   pad 2) ?\s))))
+                      (c (format " %s" cmd)))
+                  (format-spec
+                   mode-line-keycast-format
+                   `((?s . ,(make-string keycast-separator-width ?\s))
+                     (?k . ,(propertize k 'face 'keycast-key))
+                     (?K . ,k)
+                     (?c . ,(propertize c 'face 'keycast-command))
+                     (?C . ,c)
+                     (?r . ,(if (> keycast--command-repetitions 0)
+                                (format " x%s" (1+ keycast--command-repetitions))
+                              ""))))))))))
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
