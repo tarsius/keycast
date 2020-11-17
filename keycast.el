@@ -29,6 +29,9 @@
 ;; and updates them whenever another command is invoked.
 
 ;;; Code:
+
+(require 'format-spec)
+
 ;;; Options
 
 (defgroup keycast nil
