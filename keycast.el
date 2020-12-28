@@ -66,7 +66,7 @@ removes all elements to the right of where that was inserted."
 This predicate is used while updating the mode line of a window
 to determine whether the current command and its key binding
 should be displayed in its mode line.  The function is called
-with no argument and act on `selected-window'.
+with no argument and acts on `selected-window'.
 
 `moody-window-active-p'
   Return non-nil if the temporarily selected window is the
@@ -119,7 +119,7 @@ care about your weird key bindings), or to hide certain commands
 \(such as `self-insert-command').  This option allows doing that
 and more.
 
-Each element has the form (MATCH EVENT COMMAND).  MATH is an
+Each element has the form (MATCH EVENT COMMAND).  MATCH is an
 event or a command.  When a command is invoked then this package
 looks for a MATCH for that.  If there is a match, then that the
 respective EVENT and COMMAND are used.  If not, then it looks
