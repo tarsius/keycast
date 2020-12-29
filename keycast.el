@@ -208,7 +208,7 @@ instead."
   ;; Remember these values because the mode line update won't actually
   ;; happen until we return to the command loop and by that time these
   ;; values have been reset to nil.
-  (setq keycast--this-command-keys (this-command-keys))
+  (setq keycast--this-command-keys (this-single-command-keys))
   (setq keycast--this-command this-command)
   (when keycast-log-mode
     (keycast-log-update-buffer))
