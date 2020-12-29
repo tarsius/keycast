@@ -146,6 +146,38 @@ instead."
                         (const   :tag "Use actual command" t)
                         (symbol  :tag "Substitute command")))))
 
+(defcustom keycast-log-format "%-20K%C\n"
+  "The format spec used by `keycast-log-mode'.
+
+%s `keycast-separator-width' spaces.
+%k The key using the `keycast-key' face and padding.
+%K The key with no styling without any padding.
+%c The command using the `keycast-command' face.
+%C The command with-no styling.
+%r The times the command was repeated."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type 'string)
+
+(defcustom keycast-log-frame-alist
+  '((minibuffer . nil))
+  "Alist of frame parameters used by `keycast-log-mode's frame."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type 'string)
+
+(defcustom keycast-log-newest-first t
+  "Whether `keycast-log-mode' inserts events at beginning of buffer."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type 'boolean)
+
+(defcustom keycast-log-buffer-name "*keycast*"
+  "The name of the buffer used by `keycast-log-mode'."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type 'string)
+
 (defface keycast-key
   '((t (:weight bold
         :height 1.2
@@ -159,7 +191,10 @@ instead."
   "When Keycast mode is enabled, face used for the command in the mode line."
   :group 'keycast)
 
-;;; Core
+;;; Common
+
+(defvar keycast-mode)
+(defvar keycast-log-mode)
 
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
@@ -175,7 +210,10 @@ instead."
   ;; values have been reset to nil.
   (setq keycast--this-command-keys (this-command-keys))
   (setq keycast--this-command this-command)
-  (force-mode-line-update))
+  (when keycast-log-mode
+    (keycast-log-update-buffer))
+  (when keycast-mode
+    (force-mode-line-update)))
 
 (defun keycast--format (format)
   (and (not keycast--reading-passwd)
@@ -203,6 +241,8 @@ instead."
                    (?r . ,(if (> keycast--command-repetitions 0)
                               (format " x%s" (1+ keycast--command-repetitions))
                             "")))))))))
+
+;;; Mode-Line
 
 (defvar keycast--removed-tail nil)
 
@@ -232,7 +272,8 @@ instead."
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
     (setq keycast--removed-tail nil)
-    (remove-hook 'pre-command-hook 'keycast--update)))
+    (unless keycast-log-mode
+      (remove-hook 'pre-command-hook 'keycast--update))))
 
 (defun keycast--tree-member (elt tree)
   (or (member elt tree)
@@ -264,6 +305,46 @@ instead."
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
+
+;;; Log-Buffer
+
+;;;###autoload
+(define-minor-mode keycast-log-mode
+  "Log invoked commands and their key bindings in a buffer."
+  :global t
+  (cond
+   (keycast-log-mode
+    (add-hook 'pre-command-hook 'keycast--update t)
+    (keycast-log-update-buffer))
+   ((not keycast-mode)
+    (remove-hook 'pre-command-hook 'keycast--update))))
+
+(defun keycast-log-update-buffer ()
+  (when keycast--this-command
+    (let ((buf (get-buffer keycast-log-buffer-name)))
+      (unless (buffer-live-p buf)
+        (setq buf (get-buffer-create keycast-log-buffer-name))
+        (with-current-buffer buf
+          (setq buffer-read-only t)
+          (setq mode-line-format nil)
+          (let ((default-frame-alist keycast-log-frame-alist))
+            (switch-to-buffer-other-frame (current-buffer)))))
+      (with-current-buffer buf
+        (goto-char (if keycast-log-newest-first (point-min) (point-max)))
+        (let ((inhibit-read-only t))
+          (insert (keycast--format keycast-log-format)))
+        (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
+
+(defun keycast-log-erase-buffer ()
+  "Erase the contents of `keycast-log-mode's buffer."
+  (interactive)
+  (let ((buf (get-buffer keycast-log-buffer-name)))
+    (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer))))))
+
+;;; Common
 
 (defun keycast--read-passwd (fn prompt &optional confirm default)
   (let ((keycast--reading-passwd t))
