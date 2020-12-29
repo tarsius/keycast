@@ -178,6 +178,33 @@ instead."
   (setq keycast--this-command this-command)
   (force-mode-line-update))
 
+(defun keycast--format (format)
+  (and (not keycast--reading-passwd)
+       (let* ((key (ignore-errors
+                     (key-description keycast--this-command-keys)))
+              (cmd keycast--this-command)
+              (elt (or (assoc cmd keycast-substitute-alist)
+                       (assoc key keycast-substitute-alist))))
+         (when elt
+           (pcase-let ((`(,_ ,k ,c) elt))
+             (unless (eq k t) (setq key k))
+             (unless (eq c t) (setq cmd c))))
+         (and key cmd
+              (let ((k (let ((pad (max 2 (- 5 (length key)))))
+                         (concat (make-string (ceiling pad 2) ?\s) key
+                                 (make-string (floor   pad 2) ?\s))))
+                    (c (format " %s" cmd)))
+                (format-spec
+                 format
+                 `((?s . ,(make-string keycast-separator-width ?\s))
+                   (?k . ,(propertize k 'face 'keycast-key))
+                   (?K . ,k)
+                   (?c . ,(propertize c 'face 'keycast-command))
+                   (?C . ,c)
+                   (?r . ,(if (> keycast--command-repetitions 0)
+                              (format " x%s" (1+ keycast--command-repetitions))
+                            "")))))))))
+
 (defvar keycast--removed-tail nil)
 
 ;;;###autoload
@@ -234,31 +261,7 @@ instead."
 (defvar mode-line-keycast
   '(:eval
     (and (funcall keycast-window-predicate)
-         (not keycast--reading-passwd)
-         (let* ((key (ignore-errors
-                       (key-description keycast--this-command-keys)))
-                (cmd keycast--this-command)
-                (elt (or (assoc cmd keycast-substitute-alist)
-                         (assoc key keycast-substitute-alist))))
-           (when elt
-             (pcase-let ((`(,_ ,k ,c) elt))
-               (unless (eq k t) (setq key k))
-               (unless (eq c t) (setq cmd c))))
-           (and key cmd
-                (let ((k (let ((pad (max 2 (- 5 (length key)))))
-                           (concat (make-string (ceiling pad 2) ?\s) key
-                                   (make-string (floor   pad 2) ?\s))))
-                      (c (format " %s" cmd)))
-                  (format-spec
-                   mode-line-keycast-format
-                   `((?s . ,(make-string keycast-separator-width ?\s))
-                     (?k . ,(propertize k 'face 'keycast-key))
-                     (?K . ,k)
-                     (?c . ,(propertize c 'face 'keycast-command))
-                     (?C . ,c)
-                     (?r . ,(if (> keycast--command-repetitions 0)
-                                (format " x%s" (1+ keycast--command-repetitions))
-                              ""))))))))))
+         (keycast--format mode-line-keycast-format))))
 
 (put 'mode-line-keycast 'risky-local-variable t)
 (make-variable-buffer-local 'mode-line-keycast)
