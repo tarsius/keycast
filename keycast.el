@@ -242,6 +242,12 @@ instead."
                               (format " x%s" (1+ keycast--command-repetitions))
                             "")))))))))
 
+(defun keycast--read-passwd (fn prompt &optional confirm default)
+  (let ((keycast--reading-passwd t))
+    (funcall fn prompt confirm default)))
+
+(advice-add 'read-passwd :around #'keycast--read-passwd)
+
 ;;; Mode-Line
 
 (defvar keycast--removed-tail nil)
@@ -343,14 +349,6 @@ instead."
       (with-current-buffer buf
         (let ((inhibit-read-only t))
           (erase-buffer))))))
-
-;;; Common
-
-(defun keycast--read-passwd (fn prompt &optional confirm default)
-  (let ((keycast--reading-passwd t))
-    (funcall fn prompt confirm default)))
-
-(advice-add 'read-passwd :around #'keycast--read-passwd)
 
 ;;; _
 (provide 'keycast)
