@@ -96,8 +96,8 @@ with no argument and acts on `selected-window'.
   "The format spec used by `mode-line-keycast'.
 
 %s `keycast-separator-width' spaces.
-%k The key using the `keycast-key' face.
-%K The key with no styling.
+%k The key using the `keycast-key' face and padding.
+%K The key with no styling without any padding.
 %c The command using the `keycast-command' face.
 %C The command with-no styling.
 %r The times the command was repeated."
@@ -198,7 +198,7 @@ instead."
                  format
                  `((?s . ,(make-string keycast-separator-width ?\s))
                    (?k . ,(propertize k 'face 'keycast-key))
-                   (?K . ,k)
+                   (?K . ,key)
                    (?c . ,(propertize c 'face 'keycast-command))
                    (?C . ,c)
                    (?r . ,(if (> keycast--command-repetitions 0)
