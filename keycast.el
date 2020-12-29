@@ -209,7 +209,10 @@ instead."
   ;; happen until we return to the command loop and by that time these
   ;; values have been reset to nil.
   (setq keycast--this-command-keys (this-single-command-keys))
-  (setq keycast--this-command this-command)
+  (setq keycast--this-command
+        (cond ((symbolp this-command) this-command)
+              ((eq (car-safe this-command) 'lambda) "<lambda>")
+              (t (format "<%s>" (type-of this-command)))))
   (when keycast-log-mode
     (keycast-log-update-buffer))
   (when keycast-mode
