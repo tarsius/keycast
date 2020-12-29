@@ -166,8 +166,7 @@ instead."
 (defvar keycast--command-repetitions 0)
 (defvar keycast--reading-passwd nil)
 
-(defun keycast-mode-line-update ()
-  "Update mode line with current `this-command' and `this-command-keys'."
+(defun keycast--update ()
   (if (eq last-command this-command)
       (cl-incf keycast--command-repetitions)
     (setq keycast--command-repetitions 0))
@@ -224,7 +223,7 @@ instead."
                (setcdr cons (list 'mode-line-keycast)))
               (t
                (setcdr cons (cons 'mode-line-keycast (cdr cons)))))
-        (add-hook 'pre-command-hook 'keycast-mode-line-update t))
+        (add-hook 'pre-command-hook 'keycast--update t))
     (let ((cons (memq 'mode-line-keycast mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
@@ -233,7 +232,7 @@ instead."
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
     (setq keycast--removed-tail nil)
-    (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
+    (remove-hook 'pre-command-hook 'keycast--update)))
 
 (defun keycast--tree-member (elt tree)
   (or (member elt tree)
