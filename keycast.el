@@ -230,9 +230,12 @@ instead."
              (unless (eq k t) (setq key k))
              (unless (eq c t) (setq cmd c))))
          (and key cmd
-              (let ((k (let ((pad (max 2 (- 5 (length key)))))
-                         (concat (make-string (ceiling pad 2) ?\s) key
-                                 (make-string (floor   pad 2) ?\s))))
+              (let ((k (if (and (bound-and-true-p mode-line-compact)
+                                (eq format mode-line-keycast-format))
+                           key
+                         (let ((pad (max 2 (- 5 (length key)))))
+                           (concat (make-string (ceiling pad 2) ?\s) key
+                                   (make-string (floor   pad 2) ?\s)))))
                     (c (format " %s" cmd)))
                 (format-spec
                  format
