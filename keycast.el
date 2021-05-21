@@ -1,6 +1,6 @@
 ;;; keycast.el --- Show current command and its key in the mode line  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2020  Jonas Bernoulli
+;; Copyright (C) 2018-2021  Jonas Bernoulli
 
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/keycast
@@ -220,7 +220,7 @@ instead."
   (when keycast-log-mode
     (keycast-log-update-buffer))
   (when keycast-mode
-    (force-mode-line-update)))
+    (force-mode-line-update (minibufferp))))
 
 (defun keycast--format (format)
   (and (not keycast--reading-passwd)
