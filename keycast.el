@@ -32,6 +32,10 @@
 
 (require 'format-spec)
 
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'subr-x))
+
 ;;; Options
 
 (defgroup keycast nil
