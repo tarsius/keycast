@@ -220,7 +220,14 @@ instead."
   (when keycast-log-mode
     (keycast-log-update-buffer))
   (when keycast-mode
-    (force-mode-line-update)))
+    ;; Mode line isn't updated for minibuffers, so try to do so from
+    ;; the window that activated it, falling back to no buffer change.
+    (if-let ((win (and (minibufferp)
+                       (minibuffer-selected-window)))
+             (buf (window-buffer win)))
+        (with-current-buffer buf
+          (force-mode-line-update))
+      (force-mode-line-update))))
 
 (defun keycast--format (format)
   (and (not keycast--reading-passwd)
