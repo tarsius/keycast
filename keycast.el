@@ -282,7 +282,7 @@ instead."
               (t
                (setcdr cons (cons 'mode-line-keycast (cdr cons)))))
         (add-hook 'pre-command-hook 'keycast--update t))
-    (let ((cons (memq 'mode-line-keycast mode-line-format)))
+    (let ((cons (keycast--tree-member 'mode-line-keycast mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
              (setcdr cons (cdr keycast--removed-tail)))
