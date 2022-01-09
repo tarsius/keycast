@@ -352,7 +352,8 @@ instead."
       (with-current-buffer buf
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))
         (let ((inhibit-read-only t))
-          (insert (keycast--format keycast-log-format)))
+          (when-let ((output (keycast--format keycast-log-format)))
+            (insert output)))
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
 
 (defun keycast-log-erase-buffer ()
