@@ -1,6 +1,6 @@
 ;;; keycast.el --- Show current command and its key in the mode line  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2021  Jonas Bernoulli
+;; Copyright (C) 2018-2022  Jonas Bernoulli
 
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/keycast
@@ -219,7 +219,8 @@ instead."
         (cond ((symbolp this-command) this-command)
               ((eq (car-safe this-command) 'lambda) "<lambda>")
               (t (format "<%s>" (type-of this-command)))))
-  (when keycast-log-mode
+  (when (and keycast-log-mode
+             (not keycast--reading-passwd))
     (keycast-log-update-buffer))
   (when keycast-mode
     (force-mode-line-update (minibufferp))))
