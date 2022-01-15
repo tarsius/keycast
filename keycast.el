@@ -353,18 +353,18 @@ instead."
           (setq mode-line-format nil)
           (let ((default-frame-alist keycast-log-frame-alist))
             (switch-to-buffer-other-frame (current-buffer)))))
-      (with-current-buffer buf
-        (goto-char (if keycast-log-newest-first (point-min) (point-max)))
-        (let ((inhibit-read-only t))
-          (when (and (> keycast--command-repetitions 0)
-                     (string-match-p "%[rR]" keycast-log-format))
-            (unless keycast-log-newest-first
-              (backward-char))
-            (delete-region (line-beginning-position)
-                           (1+ (line-end-position))))
-          (when-let ((output (keycast--format keycast-log-format)))
-            (insert output)))
-        (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
+      (when-let ((output (keycast--format keycast-log-format)))
+        (with-current-buffer buf
+          (goto-char (if keycast-log-newest-first (point-min) (point-max)))
+          (let ((inhibit-read-only t))
+            (when (and (> keycast--command-repetitions 0)
+                       (string-match-p "%[rR]" keycast-log-format))
+              (unless keycast-log-newest-first
+                (backward-char))
+              (delete-region (line-beginning-position)
+                             (1+ (line-end-position))))
+            (insert output))
+          (goto-char (if keycast-log-newest-first (point-min) (point-max))))))))
 
 (defun keycast-log-erase-buffer ()
   "Erase the contents of `keycast-log-mode's buffer."
