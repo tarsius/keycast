@@ -353,16 +353,16 @@ instead."
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))
         (let ((inhibit-read-only t)
               (case-fold-search nil))
-          ;; delete the previous log if it's repeated
-          (when (and (string-match "%r" keycast-log-format)
-                     (> keycast--command-repetitions 0))
-            (when (and (not keycast-log-newest-first)
-                       (> (point) (point-min)))
-              (previous-line))
-            (delete-region
-             (line-beginning-position)
-             (1+ (line-end-position))))
           (when-let ((output (keycast--format keycast-log-format)))
+            ;; delete the previous log if it's repeated
+            (when (and (string-match "%r" keycast-log-format)
+                       (> keycast--command-repetitions 0))
+              (when (and (not keycast-log-newest-first)
+                         (> (point) (point-min)))
+                (previous-line))
+              (delete-region
+               (line-beginning-position)
+               (1+ (line-end-position))))
             (insert output)))
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
 
