@@ -104,9 +104,9 @@ with no argument and acts on `selected-window'.
 
 %s `keycast-separator-width' spaces.
 %k The key using the `keycast-key' face and padding.
-%K The key with no styling without any padding.
+%K The key with no styling and without any padding.
 %c The command using the `keycast-command' face.
-%C The command with-no styling.
+%C The command with no styling.
 %r The times the command was repeated."
   :package-version '(keycast . "1.0.3")
   :group 'keycast
@@ -158,9 +158,9 @@ instead."
 
 %s `keycast-separator-width' spaces.
 %k The key using the `keycast-key' face and padding.
-%K The key with no styling without any padding.
+%K The key with no styling and without any padding.
 %c The command using the `keycast-command' face.
-%C The command with-no styling.
+%C The command with no styling.
 %r The times the command was repeated."
   :package-version '(keycast . "2.0.0")
   :group 'keycast
