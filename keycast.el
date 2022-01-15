@@ -351,8 +351,7 @@ instead."
         (with-current-buffer buf
           (setq buffer-read-only t)
           (setq mode-line-format nil)
-          (let ((default-frame-alist keycast-log-frame-alist))
-            (switch-to-buffer-other-frame (current-buffer)))))
+          (display-buffer-pop-up-frame buf keycast-log-frame-alist)))
       (when-let ((output (keycast--format keycast-log-format)))
         (with-current-buffer buf
           (goto-char (if keycast-log-newest-first (point-min) (point-max)))
