@@ -46,9 +46,9 @@
   :group 'applications)
 
 (defcustom keycast-insert-after 'mode-line-buffer-identification
-  "The position in `mode-line-format' where `mode-line-keycast' is inserted.
+  "The position in `mode-line-format' where `keycast-mode-line' is inserted.
 
-Enabling `keycast-mode' inserts the element `mode-line-keycast'
+Enabling `keycast-mode' inserts the element `keycast-mode-line'
 into `mode-line-format' after the element specified here."
   :group 'keycast
   :type '(cons (choice :tag "Insert after"
@@ -62,7 +62,7 @@ into `mode-line-format' after the element specified here."
   "Whether enabling `keycast-mode' removes elements to the right.
 
 When this is non-nil, then enabling `keycast-mode' not only
-inserts `mode-line-keycast' into `mode-line-format' but also
+inserts `keycast-mode-line' into `mode-line-format' but also
 removes all elements to the right of where that was inserted."
   :group 'keycast
   :type 'boolean)
@@ -99,8 +99,8 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'function)
 
-(defcustom mode-line-keycast-format "%s%k%c%r"
-  "The format spec used by `mode-line-keycast'.
+(defcustom keycast-mode-line-format "%s%k%c%r"
+  "The format spec used by `keycast-mode-line'.
 
 %s `keycast-separator-width' spaces.
 %k The key using the `keycast-key' face and padding.
@@ -252,7 +252,7 @@ instead."
              (unless (eq c t) (setq cmd c))))
          (and key cmd
               (let ((k (if (and (bound-and-true-p mode-line-compact)
-                                (eq format mode-line-keycast-format))
+                                (eq format keycast-mode-line-format))
                            key
                          (let ((pad (max 2 (- 5 (length key)))))
                            (concat (make-string (ceiling pad 2) ?\s) key
@@ -295,11 +295,11 @@ instead."
            'keycast-insert-after))
         (cond (keycast-remove-tail-elements
                (setq keycast--removed-tail (cdr cons))
-               (setcdr cons (list 'mode-line-keycast)))
+               (setcdr cons (list 'keycast-mode-line)))
               (t
-               (setcdr cons (cons 'mode-line-keycast (cdr cons)))))
+               (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
         (add-hook 'pre-command-hook 'keycast--update t))
-    (let ((cons (keycast--tree-member 'mode-line-keycast mode-line-format)))
+    (let ((cons (keycast--tree-member 'keycast-mode-line mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
              (setcdr cons (cdr keycast--removed-tail)))
@@ -333,13 +333,13 @@ instead."
          (eq (window-frame) (window-frame powerline-selected-window)))
         (t t)))
 
-(defvar mode-line-keycast
+(defvar keycast-mode-line
   '(:eval
     (and (funcall keycast-window-predicate)
-         (keycast--format mode-line-keycast-format))))
+         (keycast--format keycast-mode-line-format))))
 
-(put 'mode-line-keycast 'risky-local-variable t)
-(make-variable-buffer-local 'mode-line-keycast)
+(put 'keycast-mode-line 'risky-local-variable t)
+(make-variable-buffer-local 'keycast-mode-line)
 
 ;;; Log-Buffer
 
