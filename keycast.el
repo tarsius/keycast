@@ -173,7 +173,7 @@ instead."
   "Alist of frame parameters used by `keycast-log-mode's frame."
   :package-version '(keycast . "2.0.0")
   :group 'keycast
-  :type 'string)
+  :type 'alist)
 
 (defcustom keycast-log-newest-first t
   "Whether `keycast-log-mode' inserts events at beginning of buffer."
