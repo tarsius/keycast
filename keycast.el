@@ -169,7 +169,18 @@ instead."
   :type 'string)
 
 (defcustom keycast-log-frame-alist
-  '((minibuffer . nil))
+  '((minibuffer . nil)
+    (no-other-frame . t)
+    (no-other-window . t)
+    (no-delete-other-windows . t)
+    (no-accept-focus . t)
+    (no-focus-on-map . t)
+    (desktop-dont-save . t)
+    (menu-bar-lines . 0)
+    (tool-bar-lines . 0)
+    (tab-bar-lines . 0)
+    (vertical-scroll-bars . nil)
+    (horizontal-scroll-bars . nil))
   "Alist of frame parameters used by `keycast-log-mode's frame."
   :package-version '(keycast . "2.0.0")
   :group 'keycast
@@ -351,7 +362,8 @@ instead."
         (setq buffer-read-only t)
         (setq mode-line-format nil)))
     (unless (get-buffer-window buf t)
-      (display-buffer-pop-up-frame buf keycast-log-frame-alist))
+      (display-buffer-pop-up-frame
+       buf `((pop-up-frame-parameters . ,keycast-log-frame-alist))))
     (when-let ((output (keycast--format keycast-log-format)))
       (with-current-buffer buf
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))
