@@ -344,27 +344,26 @@ instead."
     (remove-hook 'pre-command-hook 'keycast--update))))
 
 (defun keycast-log-update-buffer ()
-  (when keycast--this-command
-    (let ((buf (get-buffer keycast-log-buffer-name)))
-      (unless (buffer-live-p buf)
-        (setq buf (get-buffer-create keycast-log-buffer-name))
-        (with-current-buffer buf
-          (setq buffer-read-only t)
-          (setq mode-line-format nil)))
-      (unless (get-buffer-window buf t)
-        (display-buffer-pop-up-frame buf keycast-log-frame-alist))
-      (when-let ((output (keycast--format keycast-log-format)))
-        (with-current-buffer buf
-          (goto-char (if keycast-log-newest-first (point-min) (point-max)))
-          (let ((inhibit-read-only t))
-            (when (and (> keycast--command-repetitions 0)
-                       (string-match-p "%[rR]" keycast-log-format))
-              (unless keycast-log-newest-first
-                (backward-char))
-              (delete-region (line-beginning-position)
-                             (1+ (line-end-position))))
-            (insert output))
-          (goto-char (if keycast-log-newest-first (point-min) (point-max))))))))
+  (let ((buf (get-buffer keycast-log-buffer-name)))
+    (unless (buffer-live-p buf)
+      (setq buf (get-buffer-create keycast-log-buffer-name))
+      (with-current-buffer buf
+        (setq buffer-read-only t)
+        (setq mode-line-format nil)))
+    (unless (get-buffer-window buf t)
+      (display-buffer-pop-up-frame buf keycast-log-frame-alist))
+    (when-let ((output (keycast--format keycast-log-format)))
+      (with-current-buffer buf
+        (goto-char (if keycast-log-newest-first (point-min) (point-max)))
+        (let ((inhibit-read-only t))
+          (when (and (> keycast--command-repetitions 0)
+                     (string-match-p "%[rR]" keycast-log-format))
+            (unless keycast-log-newest-first
+              (backward-char))
+            (delete-region (line-beginning-position)
+                           (1+ (line-end-position))))
+          (insert output))
+        (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
 
 (defun keycast-log-erase-buffer ()
   "Erase the contents of `keycast-log-mode's buffer."
