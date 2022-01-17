@@ -181,7 +181,7 @@ instead."
   :group 'keycast
   :type 'boolean)
 
-(defcustom keycast-log-buffer-name "*keycast*"
+(defcustom keycast-log-buffer-name " *keycast*"
   "The name of the buffer used by `keycast-log-mode'."
   :package-version '(keycast . "2.0.0")
   :group 'keycast
