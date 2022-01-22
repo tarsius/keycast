@@ -372,8 +372,9 @@ instead."
                      (string-match-p "%[rR]" keycast-log-format))
             (unless keycast-log-newest-first
               (backward-char))
-            (delete-region (line-beginning-position)
-                           (1+ (line-end-position))))
+            (ignore-errors
+              (delete-region (line-beginning-position)
+                             (1+ (line-end-position)))))
           (insert output))
         (goto-char (if keycast-log-newest-first (point-min) (point-max)))))))
 
