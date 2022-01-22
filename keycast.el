@@ -120,6 +120,56 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'integer)
 
+(defcustom keycast-tab-bar-location 'tab-bar-format-align-right
+  "The location in `tab-bar-format' where `keycast-tab-bar' is inserted.
+
+Enabling `keycast-tab-bar-mode' inserts the element
+`keycast-tab-bar' into `tab-tab-bar-format' at the location
+specified here.
+
+If the value is `beginning' or `end', then insert as the first or
+last element.  If the value is `replace', then insert as the only
+element until the mode is disabled again.
+
+Otherwise the value has to be a function that should be a member
+of the format list.  `keycast-tab-bar' is inserted after that
+function if it is a member or at the end of the list if not, in
+which case a warning is shown.
+
+As a special case it the value is `tab-bar-format-align-right'
+but that isn't a member yet, then insert that followed by
+`keycast-tab-bar', without showing a warning."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type
+  '(choice
+    (const :tag "Insert after tab-bar-format-add-tab" tab-bar-format-add-tab)
+    (const :tag "Insert after tab-bar-format-align-right" tab-bar-format-align-right)
+    (const :tag "Insert after tab-bar-format-global" tab-bar-format-global)
+    (function :tag "Insert after function")
+    (const :tag "Insert as first element" beginning)
+    (const :tag "Insert as last element" end)
+    (const :tag "Replace all other elements" replace)))
+
+(defcustom keycast-tab-bar-format "%k%c%r"
+  "The format spec used by `keycast-tab-bar'.
+
+%s Some spaces, intended to be used like so: %10s.
+%k The key using the `keycast-key' face and padding.
+%K The key with no styling and without any padding.
+%c The command using the `keycast-command' face.
+%C The command with no styling.
+%r The times the command was repeated.
+%R The times the command was repeated using the `shadow' face."
+  :group 'keycast
+  :type 'integer)
+
+(defcustom keycast-tab-bar-minimal-width 40
+  "The minimal width of `keycast-tab-bar'."
+  :package-version '(keycast . "2.0.0")
+  :group 'keycast
+  :type 'integer)
+
 (defcustom keycast-log-format "%-20K%C%R\n"
   "The format spec used by `keycast-log-mode'.
 
@@ -215,7 +265,12 @@ instead."
 ;;; Common
 
 (defvar keycast-mode)
+(defvar keycast-tab-bar-mode)
 (defvar keycast-log-mode)
+
+(defun keycast--mode-active-p (&optional line)
+  (or keycast-mode keycast-tab-bar-mode
+      (and (not line) keycast-log-mode)))
 
 (defvar keycast--this-command nil)
 (defvar keycast--this-command-keys nil)
@@ -237,7 +292,7 @@ instead."
   (when (and keycast-log-mode
              (not keycast--reading-passwd))
     (keycast-log-update-buffer))
-  (when keycast-mode
+  (when (keycast--mode-active-p 'line)
     (force-mode-line-update (minibufferp))))
 
 (defun keycast--format (format)
@@ -323,7 +378,7 @@ instead."
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
     (setq keycast--removed-tail nil)
-    (unless keycast-log-mode
+    (unless (keycast--mode-active-p)
       (remove-hook 'pre-command-hook 'keycast--update))))
 
 (defun keycast--tree-member (elt tree)
@@ -342,6 +397,69 @@ instead."
 (put 'keycast-mode-line 'risky-local-variable t)
 (make-variable-buffer-local 'keycast-mode-line)
 
+;;; Tab-Bar
+
+(eval-when-compile
+  (defvar tab-bar-format))
+
+(defvar keycast--temporary-tab-bar nil)
+(defvar keycast--previous-tab-bar-format nil)
+
+;;;###autoload
+(define-minor-mode keycast-tab-bar-mode
+  "Show current command and its key binding in the tab bar."
+  :global t
+  (when (< emacs-major-version 28)
+    (user-error "`keycast-tab-bar-mode' requires Emacs 28.1"))
+  (cond
+   (keycast-tab-bar-mode
+    (unless tab-bar-mode
+      (setq keycast--temporary-tab-bar t)
+      (tab-bar-mode 1))
+    (cl-case keycast-tab-bar-location
+      (replace
+       (setq keycast--previous-tab-bar-format tab-bar-format)
+       (setq tab-bar-format (list 'keycast-tab-bar)))
+      (beginning
+       (setq tab-bar-format (cons 'keycast-tab-bar tab-bar-format)))
+      (end
+       (setq tab-bar-format (nconc tab-bar-format (list 'keycast-tab-bar))))
+      (t
+       (let ((mem (memq keycast-tab-bar-location tab-bar-format)))
+         (if mem
+             (setcdr mem (cons 'keycast-tab-bar (cdr mem)))
+           (setq tab-bar-format
+                 (nconc tab-bar-format
+                        (if (eq keycast-tab-bar-location
+                                'tab-bar-format-align-right)
+                            (list 'tab-bar-format-align-right
+                                  'keycast-tab-bar)
+                          (message "%s not found in %s; adding at end instead"
+                                   keycast-tab-bar-location 'tab-bar-format)
+                          (list 'keycast-tab-bar))))))))
+    (add-hook 'pre-command-hook 'keycast--update t))
+   (t
+    (when keycast--temporary-tab-bar
+      (setq keycast--temporary-tab-bar nil)
+      (tab-bar-mode -1))
+    (cond (keycast--previous-tab-bar-format
+           (setq tab-bar-format keycast--previous-tab-bar-format)
+           (setq keycast--previous-tab-bar-format nil))
+          (t
+           (setq tab-bar-format (delq 'keycast-tab-bar tab-bar-format))))
+    (unless (keycast--mode-active-p)
+      (remove-hook 'pre-command-hook 'keycast--update)))))
+
+(defun keycast-tab-bar ()
+  "Produce key binding information for the tab bar."
+  (and keycast-tab-bar-mode
+       (keycast--active-frame-p)
+       (when-let ((output (keycast--format keycast-tab-bar-format)))
+         (concat output
+                 (make-string (max 0 (- keycast-tab-bar-minimal-width
+                                        (length output)))
+                              ?\s)))))
+
 ;;; Log-Buffer
 
 ;;;###autoload
@@ -352,7 +470,7 @@ instead."
    (keycast-log-mode
     (add-hook 'pre-command-hook 'keycast--update t)
     (keycast-log-update-buffer))
-   ((not keycast-mode)
+   ((not (keycast--mode-active-p))
     (remove-hook 'pre-command-hook 'keycast--update))))
 
 (defun keycast-log-update-buffer ()
