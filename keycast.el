@@ -200,7 +200,6 @@ instead."
 
 (defface keycast-key
   '((t (:weight bold
-        :height 1.2
         :background "#d5cfbf"
         :foreground "#000000"
 	:box (:line-width -3 :style released-button))))
