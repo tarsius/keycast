@@ -99,10 +99,10 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'function)
 
-(defcustom keycast-mode-line-format "%s%k%c%r"
+(defcustom keycast-mode-line-format "%10s%k%c%r"
   "The format spec used by `keycast-mode-line'.
 
-%s `keycast-separator-width' spaces.
+%s Some spaces, intended to be used like so: %10s.
 %k The key using the `keycast-key' face and padding.
 %K The key with no styling and without any padding.
 %c The command using the `keycast-command' face.
@@ -110,11 +110,6 @@ with no argument and acts on `selected-window'.
 %r The times the command was repeated.
 %R The times the command was repeated using the `shadow' face."
   :package-version '(keycast . "1.0.3")
-  :group 'keycast
-  :type 'integer)
-
-(defcustom keycast-separator-width 10
-  "How many spaces to insert before the key binding."
   :group 'keycast
   :type 'integer)
 
@@ -262,7 +257,7 @@ instead."
                          "")))
                 (format-spec
                  format
-                 `((?s . ,(make-string keycast-separator-width ?\s))
+                 `((?s . "")
                    (?k . ,(propertize k 'face 'keycast-key))
                    (?K . ,key)
                    (?c . ,(propertize c 'face 'keycast-command))
