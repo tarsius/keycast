@@ -274,23 +274,50 @@ instead."
   (or keycast-mode keycast-tab-bar-mode
       (and (not line) keycast-log-mode)))
 
-(defvar keycast--this-command nil)
+(defvar keycast--this-command-desc nil)
 (defvar keycast--this-command-keys nil)
+(defvar keycast--minibuffer-exited nil)
 (defvar keycast--command-repetitions 0)
 (defvar keycast--reading-passwd nil)
 
+(defun keycast--minibuffer-exit ()
+  (setq keycast--minibuffer-exited
+        (cons (this-single-command-keys) this-command))
+  ;; If the command that used the minibuffer is immediately
+  ;; repeated, then don't treat that as a repetition because
+  ;; at least the command that exited the minibuffer was used
+  ;; in between (but `last-command' doesn't account for that).
+  (setq keycast--command-repetitions -2))
+
 (defun keycast--update ()
-  (if (eq last-command this-command)
-      (cl-incf keycast--command-repetitions)
-    (setq keycast--command-repetitions 0))
-  ;; Remember these values because the mode line update won't actually
-  ;; happen until we return to the command loop and by that time these
-  ;; values have been reset to nil.
-  (setq keycast--this-command-keys (this-single-command-keys))
-  (setq keycast--this-command
-        (cond ((symbolp this-command) this-command)
-              ((eq (car-safe this-command) 'lambda) "<lambda>")
-              (t (format "<%s>" (type-of this-command)))))
+  (let ((key (this-single-command-keys))
+        (cmd this-command))
+    (when (and keycast--minibuffer-exited
+               (or (not (equal key []))
+                   (not (eq this-original-command 'execute-extended-command))))
+      ;; Show the command that exited the minibuffer instead of
+      ;; once more showing the command that used the minibuffer.
+      (setq key (car keycast--minibuffer-exited))
+      (setq cmd (cdr keycast--minibuffer-exited)))
+    (setq keycast--minibuffer-exited nil)
+    (when (or
+           ;; If a command uses the minibuffer twice, then
+           ;; `post-command-hook' gets called twice (unless the
+           ;; minibuffer is aborted).  This is the first call.
+           (equal key [])
+           ;; `execute-extended-command' intentionally corrupts
+           ;; the value returned by `this-single-command-keys'.
+           (eq (aref key 0) ?\M-x))
+      (setq key (this-single-command-raw-keys)))
+    (setq keycast--this-command-keys key)
+    (setq keycast--this-command-desc
+          (cond ((symbolp cmd) cmd)
+                ((eq (car-safe cmd) 'lambda) "<lambda>")
+                (t (format "<%s>" (type-of cmd)))))
+    (if (or (eq last-command cmd)
+            (< keycast--command-repetitions 0))
+        (cl-incf keycast--command-repetitions)
+      (setq keycast--command-repetitions 0)))
   (when (and keycast-log-mode
              (not keycast--reading-passwd))
     (keycast-log-update-buffer))
@@ -301,7 +328,7 @@ instead."
   (and (not keycast--reading-passwd)
        (let* ((key (ignore-errors
                      (key-description keycast--this-command-keys)))
-              (cmd keycast--this-command)
+              (cmd keycast--this-command-desc)
               (elt (or (assoc cmd keycast-substitute-alist)
                        (assoc key keycast-substitute-alist))))
          (when elt
@@ -371,7 +398,8 @@ instead."
                (setcdr cons (list 'keycast-mode-line)))
               (t
                (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
-        (add-hook 'pre-command-hook 'keycast--update t))
+        (add-hook 'post-command-hook #'keycast--update t)
+        (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
     (let ((cons (keycast--tree-member 'keycast-mode-line mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
@@ -381,7 +409,8 @@ instead."
              (setcdr cons (cddr cons)))))
     (setq keycast--removed-tail nil)
     (unless (keycast--mode-active-p)
-      (remove-hook 'pre-command-hook 'keycast--update))))
+      (remove-hook 'post-command-hook #'keycast--update)
+      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit))))
 
 (defun keycast--tree-member (elt tree)
   (or (member elt tree)
@@ -439,7 +468,8 @@ instead."
                           (message "%s not found in %s; adding at end instead"
                                    keycast-tab-bar-location 'tab-bar-format)
                           (list 'keycast-tab-bar))))))))
-    (add-hook 'pre-command-hook 'keycast--update t))
+    (add-hook 'post-command-hook #'keycast--update t)
+    (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
    (t
     (when keycast--temporary-tab-bar
       (setq keycast--temporary-tab-bar nil)
@@ -450,7 +480,8 @@ instead."
           (t
            (setq tab-bar-format (delq 'keycast-tab-bar tab-bar-format))))
     (unless (keycast--mode-active-p)
-      (remove-hook 'pre-command-hook 'keycast--update)))))
+      (remove-hook 'post-command-hook #'keycast--update)
+      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
 
 (defun keycast-tab-bar ()
   "Produce key binding information for the tab bar."
@@ -470,10 +501,12 @@ instead."
   :global t
   (cond
    (keycast-log-mode
-    (add-hook 'pre-command-hook 'keycast--update t)
+    (add-hook 'post-command-hook #'keycast--update t)
+    (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
     (keycast-log-update-buffer))
    ((not (keycast--mode-active-p))
-    (remove-hook 'pre-command-hook 'keycast--update))))
+    (remove-hook 'post-command-hook #'keycast--update)
+    (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit))))
 
 (defun keycast-log-update-buffer ()
   (let ((buf (get-buffer keycast-log-buffer-name)))
