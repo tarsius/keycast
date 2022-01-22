@@ -113,42 +113,6 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'integer)
 
-(defcustom keycast-substitute-alist nil
-  "Alist used to substituted events and/or commands for display.
-
-Occasionally it might be necessary to pretend you pressed another
-key than the one you actually pressed (because watchers don't
-care about your weird key bindings), or to hide certain commands
-\(such as `self-insert-command').  This option allows doing that
-and more.
-
-Each element has the form (MATCH EVENT COMMAND).  MATCH is an
-event or a command.  When a command is invoked then this package
-looks for a MATCH for that.  If there is a match, then that the
-respective EVENT and COMMAND are used.  If not, then it looks
-for a MATCH for that instead.
-
-If either EVENT or COMMAND is nil, then neither the event nor
-the command is shown (regardless of the value of the other).
-Otherwise if EVENT is t then the actual event is shown, else
-it has to be a string to be shown instead.  Likewise COMMAND
-can be t to show the actual COMMAND or a symbol to be shown
-instead."
-  :group 'keycast
-  :type '(repeat
-          (list (choice :format "%{Actual event/command%}: %[Value Menu%] %v"
-                        (string  :tag "Event")
-                        (symbol  :tag "Command")
-                        (const   :tag "Lambda" t))
-                (choice :format "%{Display event%}:        %[Value Menu%] %v"
-                        (const   :tag "Omit binding" nil)
-                        (const   :tag "Use actual event" t)
-                        (string  :tag "Substitute event"))
-                (choice :format "%{Display command%}:      %[Value Menu%] %v"
-                        (const   :tag "Omit binding" nil)
-                        (const   :tag "Use actual command" t)
-                        (symbol  :tag "Substitute command")))))
-
 (defcustom keycast-log-format "%-20K%C%R\n"
   "The format spec used by `keycast-log-mode'.
 
@@ -192,6 +156,42 @@ instead."
   :package-version '(keycast . "2.0.0")
   :group 'keycast
   :type 'string)
+
+(defcustom keycast-substitute-alist nil
+  "Alist used to substituted events and/or commands for display.
+
+Occasionally it might be necessary to pretend you pressed another
+key than the one you actually pressed (because watchers don't
+care about your weird key bindings), or to hide certain commands
+\(such as `self-insert-command').  This option allows doing that
+and more.
+
+Each element has the form (MATCH EVENT COMMAND).  MATCH is an
+event or a command.  When a command is invoked then this package
+looks for a MATCH for that.  If there is a match, then that the
+respective EVENT and COMMAND are used.  If not, then it looks
+for a MATCH for that instead.
+
+If either EVENT or COMMAND is nil, then neither the event nor
+the command is shown (regardless of the value of the other).
+Otherwise if EVENT is t then the actual event is shown, else
+it has to be a string to be shown instead.  Likewise COMMAND
+can be t to show the actual COMMAND or a symbol to be shown
+instead."
+  :group 'keycast
+  :type '(repeat
+          (list (choice :format "%{Actual event/command%}: %[Value Menu%] %v"
+                        (string  :tag "Event")
+                        (symbol  :tag "Command")
+                        (const   :tag "Lambda" t))
+                (choice :format "%{Display event%}:        %[Value Menu%] %v"
+                        (const   :tag "Omit binding" nil)
+                        (const   :tag "Use actual event" t)
+                        (string  :tag "Substitute event"))
+                (choice :format "%{Display command%}:      %[Value Menu%] %v"
+                        (const   :tag "Omit binding" nil)
+                        (const   :tag "Use actual command" t)
+                        (symbol  :tag "Substitute command")))))
 
 (defface keycast-key
   '((t (:weight bold
