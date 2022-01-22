@@ -278,6 +278,21 @@ instead."
 
 (advice-add 'read-passwd :around #'keycast--read-passwd)
 
+(defun keycast-bottom-right-window-p ()
+  (and (window-at-side-p nil 'right)
+       (window-at-side-p nil 'bottom)))
+
+(defun keycast-active-frame-bottom-right-p ()
+  (and (keycast-bottom-right-window-p)
+       (keycast--active-frame-p)))
+
+(defun keycast--active-frame-p ()
+  (cond ((boundp 'moody--active-window)
+         (eq (window-frame) (window-frame moody--active-window)))
+        ((boundp 'powerline-selected-window)
+         (eq (window-frame) (window-frame powerline-selected-window)))
+        (t t)))
+
 ;;; Mode-Line
 
 (defvar keycast--removed-tail nil)
@@ -318,21 +333,6 @@ instead."
           (when-let ((found (and (listp sub)
                                  (keycast--tree-member elt sub))))
             (throw 'found found))))))
-
-(defun keycast-bottom-right-window-p ()
-  (and (window-at-side-p nil 'right)
-       (window-at-side-p nil 'bottom)))
-
-(defun keycast-active-frame-bottom-right-p ()
-  (and (keycast-bottom-right-window-p)
-       (keycast--active-frame-p)))
-
-(defun keycast--active-frame-p ()
-  (cond ((boundp 'moody--active-window)
-         (eq (window-frame) (window-frame moody--active-window)))
-        ((boundp 'powerline-selected-window)
-         (eq (window-frame) (window-frame powerline-selected-window)))
-        (t t)))
 
 (defvar keycast-mode-line
   '(:eval
