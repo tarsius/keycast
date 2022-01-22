@@ -39,13 +39,20 @@
   (require 'cl-lib)
   (require 'subr-x))
 
+(define-obsolete-variable-alias 'keycast-insert-after
+  'keycast-mode-line-insert-after "Keycast 2.0.0")
+(define-obsolete-variable-alias 'keycast-remove-tail-elements
+  'keycast-mode-line-remove-tail-elements "Keycast 2.0.0")
+(define-obsolete-variable-alias 'keycast-window-predicate
+  'keycast-mode-line-window-predicate "Keycast 2.0.0")
+
 ;;; Options
 
 (defgroup keycast nil
   "Show the current command and its key binding in the mode line."
   :group 'applications)
 
-(defcustom keycast-insert-after 'mode-line-buffer-identification
+(defcustom keycast-mode-line-insert-after 'mode-line-buffer-identification
   "The position in `mode-line-format' where `keycast-mode-line' is inserted.
 
 Enabling `keycast-mode' inserts the element `keycast-mode-line'
@@ -58,7 +65,7 @@ into `mode-line-format' after the element specified here."
                        sexp)
                (boolean :tag "Remove following elements")))
 
-(defcustom keycast-remove-tail-elements t
+(defcustom keycast-mode-line-remove-tail-elements t
   "Whether enabling `keycast-mode' removes elements to the right.
 
 When this is non-nil, then enabling `keycast-mode' not only
@@ -67,7 +74,7 @@ removes all elements to the right of where that was inserted."
   :group 'keycast
   :type 'boolean)
 
-(defcustom keycast-window-predicate 'keycast-active-frame-bottom-right-p
+(defcustom keycast-mode-line-window-predicate 'keycast-active-frame-bottom-right-p
   "Whether to display the binding in the mode line of the selected window.
 
 This predicate is used while updating the mode line of a window
@@ -280,14 +287,14 @@ instead."
   "Show current command and its key binding in the mode line."
   :global t
   (if keycast-mode
-      (let ((cons (keycast--tree-member keycast-insert-after mode-line-format)))
+      (let ((cons (keycast--tree-member keycast-mode-line-insert-after mode-line-format)))
         (unless cons
           (setq keycast-mode nil)
           (user-error
            "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
-           'keycast-mode keycast-insert-after 'mode-line-format
-           'keycast-insert-after))
-        (cond (keycast-remove-tail-elements
+           'keycast-mode keycast-mode-line-insert-after 'mode-line-format
+           'keycast-mode-line-insert-after))
+        (cond (keycast-mode-line-remove-tail-elements
                (setq keycast--removed-tail (cdr cons))
                (setcdr cons (list 'keycast-mode-line)))
               (t
@@ -329,7 +336,7 @@ instead."
 
 (defvar keycast-mode-line
   '(:eval
-    (and (funcall keycast-window-predicate)
+    (and (funcall keycast-mode-line-window-predicate)
          (keycast--format keycast-mode-line-format))))
 
 (put 'keycast-mode-line 'risky-local-variable t)
