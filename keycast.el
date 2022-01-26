@@ -214,7 +214,8 @@ but that isn't a member yet, then insert that followed by
   :group 'keycast
   :type 'string)
 
-(defcustom keycast-substitute-alist nil
+(defcustom keycast-substitute-alist
+  '((keycast-log-erase-buffer nil nil))
   "Alist used to substituted events and/or commands for display.
 
 Occasionally it might be necessary to pretend you pressed another
