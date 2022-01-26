@@ -227,16 +227,17 @@ and more.
 
 Each element has the form (MATCH EVENT COMMAND).  MATCH is an
 event or a command.  When a command is invoked then this package
-looks for a MATCH for that.  If there is a match, then that the
-respective EVENT and COMMAND are used.  If not, then it looks
-for a MATCH for that instead.
+looks for a MATCH for that.  If and only if there is no match for
+that, then it looks for a MATCH for its key binding.  If there is
+a match of either kind, then the respective EVENT and COMMAND are
+used.
 
-If either EVENT or COMMAND is nil, then neither the event nor
-the command is shown (regardless of the value of the other).
-Otherwise if EVENT is t then the actual event is shown, else
-it has to be a string to be shown instead.  Likewise COMMAND
-can be t to show the actual COMMAND or a symbol to be shown
-instead."
+If either EVENT or COMMAND is nil, then neither the event nor the
+command is shown (regardless of the value of the other).
+
+Otherwise if EVENT is t then the actual event is shown, else it
+has to be a string to be shown instead.  Likewise COMMAND can be
+t to show the actual COMMAND, or a symbol to be shown instead."
   :group 'keycast
   :type '(repeat
           (list (choice :format "%{Actual event/command%}: %[Value Menu%] %v"
