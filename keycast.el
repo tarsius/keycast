@@ -251,10 +251,11 @@ instead."
                         (symbol  :tag "Substitute command")))))
 
 (defface keycast-key
-  '((t (:weight bold
-        :background "#d5cfbf"
-        :foreground "#000000"
-	:box (:line-width -3 :style released-button))))
+  '((t ( :inherit fixed-pitch
+         :weight bold
+         :background "#d5cfbf"
+         :foreground "#000000"
+	 :box (:line-width -3 :style released-button))))
   "When Keycast mode is enabled, face used for the key in the mode line."
   :group 'keycast)
 
