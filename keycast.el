@@ -6,7 +6,7 @@
 ;; Homepage: https://github.com/tarsius/keycast
 
 ;; Package-Requires: ((emacs "25.3"))
-;; Package-Version: 1.2.0
+;; Package-Version: 1.2.0-git
 
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 
