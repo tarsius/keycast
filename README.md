@@ -1,11 +1,10 @@
-Show current command and its key in the mode line
-=================================================
+Show current command and its binding
+====================================
 
-This package provides two modes that display the current command
-and its key or mouse binding, and update the displayed information
-once another command is invoked.
-
-`keycast-mode` displays the command and event in the mode-line and
-`keycast-log-mode` displays them in a dedicated frame.
+This package provides three modes that display the current command and
+its key or mouse binding.  `keycast-mode` shows the current binding in
+the mode-line while `keycast-tab-bar-mode` displays it in the tab-bar.
+`keycast-log-mode` displays a list of recent bindings in a dedicated
+frame.
 
 ![screenshot](http://readme.emacsair.me/keycast.png)

@@ -1,4 +1,4 @@
-;;; keycast.el --- Show current command and its key in the mode line  -*- lexical-binding: t -*-
+;;; keycast.el --- Show current command and its binding  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-2022  Jonas Bernoulli
 
@@ -27,9 +27,11 @@
 
 ;;; Commentary:
 
-;; This package provides Keycast mode.  Once enabled, that mode shows
-;; the current command and its key or mouse binding in the mode line,
-;; and updates them whenever another command is invoked.
+;; This package provides three modes that display the current command and
+;; its key or mouse binding.  `keycast-mode' shows the current binding in
+;; the mode-line while `keycast-tab-bar-mode' displays it in the tab-bar.
+;; `keycast-log-mode' displays a list of recent bindings in a dedicated
+;; frame.
 
 ;;; Code:
 
