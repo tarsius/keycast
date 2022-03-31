@@ -260,7 +260,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
          :weight bold
          :background "#d5cfbf"
          :foreground "#000000"
-	 :box (:line-width -3 :style released-button))))
+         :box (:line-width -3 :style released-button))))
   "When Keycast mode is enabled, face used for the key in the mode line."
   :group 'keycast)
 
