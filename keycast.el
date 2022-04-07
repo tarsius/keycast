@@ -435,7 +435,9 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 ;;; Tab-Bar
 
 (eval-when-compile
-  (defvar tab-bar-format))
+  (defvar tab-bar-format)
+  (defvar tab-bar-mode))
+(declare-function tab-bar-mode "tab-bar" (&optional arg))
 
 (defvar keycast--temporary-tab-bar nil)
 (defvar keycast--previous-tab-bar-format nil)
