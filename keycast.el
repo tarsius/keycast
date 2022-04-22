@@ -5,7 +5,7 @@
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/keycast
 
-;; Package-Requires: ((emacs "25.3"))
+;; Package-Requires: ((emacs "25.3") (compat "28.1.1.0"))
 ;; Package-Version: 1.2.0-git
 
 ;; SPDX-License-Identifier: GPL-3.0-or-later
@@ -35,6 +35,7 @@
 
 ;;; Code:
 
+(require 'compat)
 (require 'format-spec)
 
 (eval-when-compile
