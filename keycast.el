@@ -494,7 +494,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   "Produce key binding information for the tab bar."
   (and keycast-tab-bar-mode
        (keycast--active-frame-p)
-       (when-let ((output (keycast--format keycast-tab-bar-format)))
+       (and-let* ((output (keycast--format keycast-tab-bar-format)))
          (concat output
                  (make-string (max 0 (- keycast-tab-bar-minimal-width
                                         (length output)))
