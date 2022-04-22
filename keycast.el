@@ -37,9 +37,8 @@
 (require 'compat)
 (require 'format-spec)
 
-(eval-when-compile
-  (require 'cl-lib)
-  (require 'subr-x))
+(eval-when-compile (require 'cl-lib))
+(eval-when-compile (require 'subr-x))
 
 (define-obsolete-variable-alias 'keycast-insert-after
   'keycast-mode-line-insert-after "Keycast 2.0.0")
