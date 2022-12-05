@@ -53,6 +53,8 @@
   "Show the current command and its key binding in the mode line."
   :group 'applications)
 
+;;;; Mode-Line
+
 (defcustom keycast-mode-line-insert-after 'mode-line-buffer-identification
   "The position in `mode-line-format' where `keycast-mode-line' is inserted.
 
@@ -121,6 +123,8 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'integer)
 
+;;;; Tab-Bar
+
 (defcustom keycast-tab-bar-location 'tab-bar-format-align-right
   "The location in `tab-bar-format' where `keycast-tab-bar' is inserted.
 
@@ -170,6 +174,8 @@ but that isn't a member yet, then insert that followed by
   :package-version '(keycast . "2.0.0")
   :group 'keycast
   :type 'integer)
+
+;;;; Log-Buffer
 
 (defcustom keycast-log-format "%-20K%C%R\n"
   "The format spec used by `keycast-log-mode'.
@@ -253,6 +259,8 @@ t to show the actual COMMAND, or a symbol to be shown instead."
                         (const   :tag "Omit binding" nil)
                         (const   :tag "Use actual command" t)
                         (symbol  :tag "Substitute command")))))
+
+;;;; Faces
 
 (defface keycast-key
   '((t ( :inherit fixed-pitch
