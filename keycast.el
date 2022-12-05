@@ -399,21 +399,24 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (define-minor-mode keycast-mode-line-mode
   "Show current command and its key binding in the mode line."
   :global t
-  (if keycast-mode-line-mode
-      (let ((cons (keycast--tree-member keycast-mode-line-insert-after mode-line-format)))
-        (unless cons
-          (setq keycast-mode-line-mode nil)
-          (user-error
-           "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
-           'keycast-mode-line-mode keycast-mode-line-insert-after
-           'mode-line-format 'keycast-mode-line-insert-after))
-        (cond (keycast-mode-line-remove-tail-elements
-               (setq keycast--removed-tail (cdr cons))
-               (setcdr cons (list 'keycast-mode-line)))
-              (t
-               (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
-        (add-hook 'post-command-hook #'keycast--update t)
-        (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
+  (cond
+   (keycast-mode-line-mode
+    (let ((cons (keycast--tree-member keycast-mode-line-insert-after
+                                      mode-line-format)))
+      (unless cons
+        (setq keycast-mode-line-mode nil)
+        (user-error
+         "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
+         'keycast-mode-line-mode keycast-mode-line-insert-after
+         'mode-line-format 'keycast-mode-line-insert-after))
+      (cond (keycast-mode-line-remove-tail-elements
+             (setq keycast--removed-tail (cdr cons))
+             (setcdr cons (list 'keycast-mode-line)))
+            (t
+             (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
+      (add-hook 'post-command-hook #'keycast--update t)
+      (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
+   (t
     (let ((cons (keycast--tree-member 'keycast-mode-line mode-line-format)))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
@@ -424,7 +427,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
     (setq keycast--removed-tail nil)
     (unless (keycast--mode-active-p)
       (remove-hook 'post-command-hook #'keycast--update)
-      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit))))
+      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
 
 (defun keycast--tree-member (elt tree)
   (or (member elt tree)
