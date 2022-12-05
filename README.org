@@ -1,9 +1,18 @@
 * Show current command and its binding
 
-This package provides three modes that display the current command and
-its key or mouse binding.  ~keycast-mode~ shows the current binding in
-the mode-line while ~keycast-tab-bar-mode~ displays it in the tab-bar.
-~keycast-log-mode~ displays a list of recent bindings in a dedicated
-frame.
+This package provides four modes that display the current command and
+its key or mouse binding.
+
+- ~keycast-mode-line-mode~ shows the current binding at the bottom of
+  the selected window, in its mode line.
+
+- ~keycast-header-line-mode~ shows the current binding at the top of
+  the selected window, in its header line.
+
+- ~keycast-tab-bar-mode~ shows the current binding at the top of
+  the selected frame, in its tab bar.
+
+- ~keycast-log-mode~ displays a list of recent bindings in a dedicated
+  frame.
 
 [[http://readme.emacsair.me/keycast.png]]
