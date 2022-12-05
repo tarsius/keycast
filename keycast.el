@@ -330,11 +330,30 @@ t to show the actual COMMAND, or a symbol to be shown instead."
             (< keycast--command-repetitions 0))
         (cl-incf keycast--command-repetitions)
       (setq keycast--command-repetitions 0)))
+  (when keycast-mode-line-mode
+    (keycast--maybe-edit-local-format
+     'mode-line-format
+     'keycast-mode-line
+     'keycast--mode-line-modified-buffers))
   (when (and keycast-log-mode
              (not keycast--reading-passwd))
     (keycast-log-update-buffer))
   (when (keycast--mode-active-p 'line)
     (force-mode-line-update (minibufferp))))
+
+(defun keycast--maybe-edit-local-format (format item record)
+  (let ((value (buffer-local-value format (current-buffer))))
+    (unless (and (listp value)
+                 (memq item value))
+      (set record (cons (current-buffer) (symbol-value record)))
+      (set format (if (keycast--format-atom-p value)
+                      (list "" item value)
+                    (nconc (list "" item) value))))))
+
+(defun keycast--format-atom-p (format)
+  (or (stringp format)
+      (and (not (stringp (car-safe format)))
+           (not (listp (car-safe format))))))
 
 (defun keycast--format (format)
   (and (not keycast--reading-passwd)
@@ -393,6 +412,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defvar keycast--removed-tail nil)
 (defvar keycast--temporary-mode-line nil)
+(defvar keycast--mode-line-modified-buffers nil)
 
 (defalias 'keycast-mode 'keycast-mode-line-mode)
 
@@ -435,6 +455,11 @@ t to show the actual COMMAND, or a symbol to be shown instead."
             (t
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
+    (dolist (buf keycast--mode-line-modified-buffers)
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (setq-local mode-line-format
+                      (delq 'keycast-mode-line mode-line-format)))))
     (unless (keycast--mode-active-p)
       (remove-hook 'post-command-hook #'keycast--update)
       (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
