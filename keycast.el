@@ -408,6 +408,14 @@ t to show the actual COMMAND, or a symbol to be shown instead."
          (eq (window-frame) (window-frame powerline-selected-window)))
         (t t)))
 
+(defun keycast--tree-member (elt tree)
+  (or (member elt tree)
+      (catch 'found
+        (dolist (sub tree)
+          (when-let ((found (and (listp sub)
+                                 (keycast--tree-member elt sub))))
+            (throw 'found found))))))
+
 ;;; Mode-Line
 
 (defvar keycast--mode-line-removed-tail nil)
@@ -463,14 +471,6 @@ t to show the actual COMMAND, or a symbol to be shown instead."
     (unless (keycast--mode-active-p)
       (remove-hook 'post-command-hook #'keycast--update)
       (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
-
-(defun keycast--tree-member (elt tree)
-  (or (member elt tree)
-      (catch 'found
-        (dolist (sub tree)
-          (when-let ((found (and (listp sub)
-                                 (keycast--tree-member elt sub))))
-            (throw 'found found))))))
 
 (defvar keycast-mode-line
   '(:eval
