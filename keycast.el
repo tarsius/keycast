@@ -123,6 +123,43 @@ with no argument and acts on `selected-window'.
   :group 'keycast
   :type 'integer)
 
+;;;; Header-Line
+
+(defcustom keycast-header-line-insert-after ""
+  "The position in `header-line-format' where `keycast-header-line' is inserted.
+
+Enabling `keycast-header-line-mode' inserts the element
+`keycast-header-line' into `header-line-format' after the
+element specified here."
+  :group 'keycast
+  :type '(cons (choice :tag "Insert after"
+                       variable
+                       sexp)
+               (boolean :tag "Remove following elements")))
+
+(defcustom keycast-header-line-remove-tail-elements t
+  "Whether enabling `keycast-header-line-mode' removes elements to the right.
+
+When this is non-nil, then enabling `keycast-header-linemode' not
+only inserts `keycast-header-line' into `header-line-format' but
+also removes all elements to the right of where that was inserted."
+  :group 'keycast
+  :type 'boolean)
+
+(defcustom keycast-header-line-format "%k%c%r "
+  "The format spec used by `keycast-header-line'.
+
+%s Some spaces, intended to be used like so: %10s.
+%k The key using the `keycast-key' face and padding.
+%K The key with no styling and without any padding.
+%c The command using the `keycast-command' face.
+%C The command with no styling.
+%r The times the command was repeated.
+%R The times the command was repeated using the `shadow' face."
+  :package-version '(keycast . "1.0.3")
+  :group 'keycast
+  :type 'integer)
+
 ;;;; Tab-Bar
 
 (defcustom keycast-tab-bar-location 'tab-bar-format-align-right
@@ -278,11 +315,13 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 ;;; Common
 
 (defvar keycast-mode-line-mode)
+(defvar keycast-header-line-mode)
 (defvar keycast-tab-bar-mode)
 (defvar keycast-log-mode)
 
 (defun keycast--mode-active-p (&optional line)
   (or keycast-mode-line-mode
+      keycast-header-line-mode
       keycast-tab-bar-mode
       (and (not line) keycast-log-mode)))
 
@@ -335,6 +374,11 @@ t to show the actual COMMAND, or a symbol to be shown instead."
      'mode-line-format
      'keycast-mode-line
      'keycast--mode-line-modified-buffers))
+  (when keycast-header-line-mode
+    (keycast--maybe-edit-local-format
+     'header-line-format
+     'keycast-header-line
+     'keycast--header-line-modified-buffers))
   (when (and keycast-log-mode
              (not keycast--reading-passwd))
     (keycast-log-update-buffer))
@@ -479,6 +523,69 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (put 'keycast-mode-line 'risky-local-variable t)
 (make-variable-buffer-local 'keycast-mode-line)
+
+;;; Header-Line
+
+(defvar keycast--temporary-header-line nil)
+(defvar keycast--header-line-removed-tail nil)
+(defvar keycast--header-line-modified-buffers nil)
+
+;;;###autoload
+(define-minor-mode keycast-header-line-mode
+  "Show current command and its key binding in the header line."
+  :global t
+  (cond
+   (keycast-header-line-mode
+    (cond ((not (default-value 'header-line-format))
+           (setq keycast--temporary-header-line t)
+           (setq-default header-line-format (list "")))
+          ((keycast--format-atom-p header-line-format)
+           (setq-default header-line-format (list "" header-line-format))))
+    (let ((cons (keycast--tree-member keycast-header-line-insert-after
+                                      (default-value 'header-line-format))))
+      (unless cons
+        (setq keycast-header-line-mode nil)
+        (user-error
+         "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
+         'keycast-header-line-mode keycast-header-line-insert-after
+         'header-line-format 'keycast-header-line-insert-after))
+      (cond (keycast-header-line-remove-tail-elements
+             (setq keycast--header-line-removed-tail (cdr cons))
+             (setcdr cons (list 'keycast-header-line)))
+            (t
+             (setcdr cons (cons 'keycast-header-line (cdr cons)))))
+      (add-hook 'post-command-hook #'keycast--update t)
+      (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
+   (t
+    (let ((cons (keycast--tree-member 'keycast-header-line
+                                      (default-value 'header-line-format))))
+      (cond (keycast--temporary-header-line
+             (setq keycast--temporary-header-line nil)
+             (setq-default header-line-format nil))
+            (keycast--header-line-removed-tail
+             (setcar cons (car keycast--header-line-removed-tail))
+             (setcdr cons (cdr keycast--header-line-removed-tail)))
+            (t
+             (setcar cons (cadr cons))
+             (setcdr cons (cddr cons)))))
+    (setq keycast--header-line-removed-tail nil)
+    (dolist (buf keycast--header-line-modified-buffers)
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (unless (stringp header-line-format)
+            (setq header-line-format
+                  (delq 'keycast-header-line header-line-format))))))
+    (unless (keycast--mode-active-p)
+      (remove-hook 'post-command-hook #'keycast--update)
+      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
+
+(defvar keycast-header-line
+  '(:eval
+    (and (funcall keycast-window-predicate)
+         (keycast--format keycast-header-line-format))))
+
+(put 'keycast-header-line 'risky-local-variable t)
+(make-variable-buffer-local 'keycast-header-line)
 
 ;;; Tab-Bar
 
