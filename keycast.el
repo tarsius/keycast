@@ -410,7 +410,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 ;;; Mode-Line
 
-(defvar keycast--removed-tail nil)
+(defvar keycast--mode-line-removed-tail nil)
 (defvar keycast--temporary-mode-line nil)
 (defvar keycast--mode-line-modified-buffers nil)
 
@@ -436,7 +436,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
          'keycast-mode-line-mode keycast-mode-line-insert-after
          'mode-line-format 'keycast-mode-line-insert-after))
       (cond (keycast-mode-line-remove-tail-elements
-             (setq keycast--removed-tail (cdr cons))
+             (setq keycast--mode-line-removed-tail (cdr cons))
              (setcdr cons (list 'keycast-mode-line)))
             (t
              (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
@@ -448,10 +448,10 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       (cond (keycast--temporary-mode-line
              (setq-default mode-line-format nil)
              (setq keycast--temporary-mode-line nil))
-            (keycast--removed-tail
-             (setcar cons (car keycast--removed-tail))
-             (setcdr cons (cdr keycast--removed-tail))
-             (setq keycast--removed-tail nil))
+            (keycast--mode-line-removed-tail
+             (setcar cons (car keycast--mode-line-removed-tail))
+             (setcdr cons (cdr keycast--mode-line-removed-tail))
+             (setq keycast--mode-line-removed-tail nil))
             (t
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
