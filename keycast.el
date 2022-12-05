@@ -392,6 +392,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 ;;; Mode-Line
 
 (defvar keycast--removed-tail nil)
+(defvar keycast--temporary-mode-line nil)
 
 (defalias 'keycast-mode 'keycast-mode-line-mode)
 
@@ -401,6 +402,11 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   :global t
   (cond
    (keycast-mode-line-mode
+    (cond ((not (default-value 'mode-line-format))
+           (setq keycast--temporary-mode-line t)
+           (setq-default mode-line-format (list "")))
+          ((keycast--format-atom-p mode-line-format)
+           (setq-default mode-line-format (list "" mode-line-format))))
     (let ((cons (keycast--tree-member keycast-mode-line-insert-after
                                       (default-value 'mode-line-format))))
       (unless cons
@@ -419,13 +425,16 @@ t to show the actual COMMAND, or a symbol to be shown instead."
    (t
     (let ((cons (keycast--tree-member 'keycast-mode-line
                                       (default-value 'mode-line-format))))
-      (cond (keycast--removed-tail
+      (cond (keycast--temporary-mode-line
+             (setq-default mode-line-format nil)
+             (setq keycast--temporary-mode-line nil))
+            (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
-             (setcdr cons (cdr keycast--removed-tail)))
+             (setcdr cons (cdr keycast--removed-tail))
+             (setq keycast--removed-tail nil))
             (t
              (setcar cons (cadr cons))
              (setcdr cons (cddr cons)))))
-    (setq keycast--removed-tail nil)
     (unless (keycast--mode-active-p)
       (remove-hook 'post-command-hook #'keycast--update)
       (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
