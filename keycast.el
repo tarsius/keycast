@@ -277,12 +277,13 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 ;;; Common
 
-(defvar keycast-mode)
+(defvar keycast-mode-line-mode)
 (defvar keycast-tab-bar-mode)
 (defvar keycast-log-mode)
 
 (defun keycast--mode-active-p (&optional line)
-  (or keycast-mode keycast-tab-bar-mode
+  (or keycast-mode-line-mode
+      keycast-tab-bar-mode
       (and (not line) keycast-log-mode)))
 
 (defvar keycast--this-command-desc nil)
@@ -392,18 +393,20 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defvar keycast--removed-tail nil)
 
+(defalias 'keycast-mode 'keycast-mode-line-mode)
+
 ;;;###autoload
-(define-minor-mode keycast-mode
+(define-minor-mode keycast-mode-line-mode
   "Show current command and its key binding in the mode line."
   :global t
-  (if keycast-mode
+  (if keycast-mode-line-mode
       (let ((cons (keycast--tree-member keycast-mode-line-insert-after mode-line-format)))
         (unless cons
-          (setq keycast-mode nil)
+          (setq keycast-mode-line-mode nil)
           (user-error
            "Cannot turn on %s.  %s not found in %s.  Try customizing %s."
-           'keycast-mode keycast-mode-line-insert-after 'mode-line-format
-           'keycast-mode-line-insert-after))
+           'keycast-mode-line-mode keycast-mode-line-insert-after
+           'mode-line-format 'keycast-mode-line-insert-after))
         (cond (keycast-mode-line-remove-tail-elements
                (setq keycast--removed-tail (cdr cons))
                (setcdr cons (list 'keycast-mode-line)))
