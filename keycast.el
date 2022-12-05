@@ -402,7 +402,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   (cond
    (keycast-mode-line-mode
     (let ((cons (keycast--tree-member keycast-mode-line-insert-after
-                                      mode-line-format)))
+                                      (default-value 'mode-line-format))))
       (unless cons
         (setq keycast-mode-line-mode nil)
         (user-error
@@ -417,7 +417,8 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       (add-hook 'post-command-hook #'keycast--update t)
       (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
    (t
-    (let ((cons (keycast--tree-member 'keycast-mode-line mode-line-format)))
+    (let ((cons (keycast--tree-member 'keycast-mode-line
+                                      (default-value 'mode-line-format))))
       (cond (keycast--removed-tail
              (setcar cons (car keycast--removed-tail))
              (setcdr cons (cdr keycast--removed-tail)))
