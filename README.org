@@ -16,3 +16,8 @@ its key or mouse binding.
   frame.
 
 [[http://readme.emacsair.me/keycast.png]]
+
+#+html: <br><br>
+#+html: <a href="https://github.com/tarsius/keycast/actions/workflows/compile.yml"><img alt="Compile" src="https://github.com/tarsius/keycast/actions/workflows/compile.yml/badge.svg"/></a>
+#+html: <a href="https://stable.melpa.org/#/keycast"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/keycast-badge.svg"/></a>
+#+html: <a href="https://melpa.org/#/keycast"><img alt="MELPA" src="https://melpa.org/packages/keycast/-badge.svg"/></a>
