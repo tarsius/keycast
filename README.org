@@ -19,5 +19,6 @@ its key or mouse binding.
 
 #+html: <br><br>
 #+html: <a href="https://github.com/tarsius/keycast/actions/workflows/compile.yml"><img alt="Compile" src="https://github.com/tarsius/keycast/actions/workflows/compile.yml/badge.svg"/></a>
+#+html: <a href="https://elpa.nongnu.org/nongnu/keycast.html"><img alt="NonGNU ELPA" src="https://elpa.nongnu.org/nongnu/keycast.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/keycast"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/keycast-badge.svg"/></a>
 #+html: <a href="https://melpa.org/#/keycast"><img alt="MELPA" src="https://melpa.org/packages/keycast-badge.svg"/></a>
