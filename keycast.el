@@ -462,12 +462,13 @@ t to show the actual COMMAND, or a symbol to be shown instead."
         (t t)))
 
 (defun keycast--tree-member (elt tree)
-  (or (member elt tree)
-      (catch 'found
-        (dolist (sub tree)
-          (when-let ((found (and (listp sub)
-                                 (keycast--tree-member elt sub))))
-            (throw 'found found))))))
+  ;; Also known as auto-compile--tree-member.
+  (and (listp sub)
+       (or (member elt tree)
+           (catch 'found
+             (dolist (sub tree)
+               (when-let ((found (keycast--tree-member elt sub)))
+                 (throw 'found found)))))))
 
 ;;; Mode-Line
 
