@@ -463,7 +463,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defun keycast--tree-member (elt tree)
   ;; Also known as auto-compile--tree-member.
-  (and (listp sub)
+  (and (listp tree)
        (or (member elt tree)
            (catch 'found
              (dolist (sub tree)
