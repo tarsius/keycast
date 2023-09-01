@@ -96,7 +96,7 @@ with no argument and acts on `selected-window'.
 
 `moody-window-active-p'
   Return non-nil if the temporarily selected window is the
-  active window, i.e. if it is the selected window as far
+  active window, i.e., if it is the selected window as far
   as the user is concerned.  Load the `moody' library to be
   able to use this.
 
