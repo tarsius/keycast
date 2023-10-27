@@ -67,8 +67,9 @@
 (defcustom keycast-mode-line-insert-after 'mode-line-buffer-identification
   "The position in `mode-line-format' where `keycast-mode-line' is inserted.
 
-Enabling `keycast-mode' inserts the element `keycast-mode-line'
-into `mode-line-format' after the element specified here."
+Enabling `keycast-mode-line-mode' inserts the element
+`keycast-mode-line' into `mode-line-format' after the
+element specified here."
   :group 'keycast
   :type '(cons (choice :tag "Insert after"
                        (const mode-line-buffer-identification)
@@ -78,10 +79,10 @@ into `mode-line-format' after the element specified here."
                (boolean :tag "Remove following elements")))
 
 (defcustom keycast-mode-line-remove-tail-elements t
-  "Whether enabling `keycast-mode' removes elements to the right.
+  "Whether enabling `keycast-mode-line-mode' removes elements to the right.
 
-When this is non-nil, then enabling `keycast-mode' not only
-inserts `keycast-mode-line' into `mode-line-format' but also
+When this is non-nil, then enabling `keycast-mode-line-mode' not
+only inserts `keycast-mode-line' into `mode-line-format' but also
 removes all elements to the right of where that was inserted."
   :group 'keycast
   :type 'boolean)
