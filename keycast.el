@@ -49,13 +49,6 @@
 (eval-when-compile (require 'cl-lib))
 (eval-when-compile (require 'subr-x))
 
-(define-obsolete-variable-alias 'keycast-insert-after
-  'keycast-mode-line-insert-after "Keycast 2.0.0")
-(define-obsolete-variable-alias 'keycast-remove-tail-elements
-  'keycast-mode-line-remove-tail-elements "Keycast 2.0.0")
-(define-obsolete-variable-alias 'keycast-window-predicate
-  'keycast-mode-line-window-predicate "Keycast 2.0.0")
-
 ;;; Options
 
 (defgroup keycast nil
