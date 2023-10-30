@@ -261,6 +261,8 @@ but that isn't a member yet, then insert that followed by
   :group 'keycast
   :type 'string)
 
+;;;; Common
+
 (defcustom keycast-substitute-alist
   '((keycast-log-erase-buffer nil nil)
     (transient-update         nil nil))
