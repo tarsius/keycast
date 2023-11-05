@@ -587,7 +587,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defvar keycast-header-line
   '(:eval
-    (and (funcall keycast-window-predicate)
+    (and (funcall keycast-mode-line-window-predicate)
          (keycast--format keycast-header-line-format))))
 
 (put 'keycast-header-line 'risky-local-variable t)
