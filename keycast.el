@@ -124,7 +124,7 @@ with no argument and acts on `selected-window'.
 %R The times the command was repeated using the `shadow' face."
   :package-version '(keycast . "1.0.3")
   :group 'keycast
-  :type 'integer)
+  :type 'string)
 
 ;;;; Header-Line
 
@@ -161,7 +161,7 @@ also removes all elements to the right of where that was inserted."
 %R The times the command was repeated using the `shadow' face."
   :package-version '(keycast . "1.0.3")
   :group 'keycast
-  :type 'integer)
+  :type 'string)
 
 ;;;; Tab-Bar
 
@@ -207,7 +207,7 @@ but that isn't a member yet, then insert that followed by
 %r The times the command was repeated.
 %R The times the command was repeated using the `shadow' face."
   :group 'keycast
-  :type 'integer)
+  :type 'string)
 
 (defcustom keycast-tab-bar-minimal-width 40
   "The minimal width of `keycast-tab-bar'."
