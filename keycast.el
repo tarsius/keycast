@@ -64,12 +64,11 @@ Enabling `keycast-mode-line-mode' inserts the element
 `keycast-mode-line' into `mode-line-format' after the
 element specified here."
   :group 'keycast
-  :type '(cons (choice :tag "Insert after"
-                       (const mode-line-buffer-identification)
-                       (const moody-mode-line-buffer-identification)
-                       variable
-                       sexp)
-               (boolean :tag "Remove following elements")))
+  :type '(choice :tag "Insert after"
+                 (const mode-line-buffer-identification)
+                 (const moody-mode-line-buffer-identification)
+                 variable
+                 sexp))
 
 (defcustom keycast-mode-line-remove-tail-elements t
   "Whether enabling `keycast-mode-line-mode' removes elements to the right.
@@ -135,10 +134,10 @@ Enabling `keycast-header-line-mode' inserts the element
 `keycast-header-line' into `header-line-format' after the
 element specified here."
   :group 'keycast
-  :type '(cons (choice :tag "Insert after"
-                       variable
-                       sexp)
-               (boolean :tag "Remove following elements")))
+  :type '(choice :tag "Insert after"
+                 string
+                 variable
+                 sexp))
 
 (defcustom keycast-header-line-remove-tail-elements t
   "Whether enabling `keycast-header-line-mode' removes elements to the right.
