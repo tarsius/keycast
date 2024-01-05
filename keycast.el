@@ -496,7 +496,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
              (setq keycast--mode-line-removed-tail (cdr cons))
              (setcdr cons (list 'keycast-mode-line)))
             (t
-             (setcdr cons (cons 'keycast-mode-line (cdr cons)))))
+             (setcdr cons (cl-pushnew 'keycast-mode-line (cdr cons)))))
       (add-hook 'post-command-hook #'keycast--update t)
       (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
    (t
@@ -558,7 +558,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
              (setq keycast--header-line-removed-tail (cdr cons))
              (setcdr cons (list 'keycast-header-line)))
             (t
-             (setcdr cons (cons 'keycast-header-line (cdr cons)))))
+             (setcdr cons (cl-pushnew 'keycast-header-line (cdr cons)))))
       (add-hook 'post-command-hook #'keycast--update t)
       (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
    (t
@@ -624,7 +624,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       (t
        (let ((mem (memq keycast-tab-bar-location tab-bar-format)))
          (if mem
-             (setcdr mem (cons 'keycast-tab-bar (cdr mem)))
+             (setcdr mem (cl-pushnew 'keycast-tab-bar (cdr mem)))
            (setq tab-bar-format
                  (nconc tab-bar-format
                         (if (eq keycast-tab-bar-location
