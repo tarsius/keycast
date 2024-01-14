@@ -334,6 +334,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defvar keycast--minibuffer-exited nil)
 (defvar keycast--command-repetitions 0)
 (defvar keycast--reading-passwd nil)
+(defvar keycast--pre-command nil)
 
 (defun keycast--minibuffer-exit ()
   (setq keycast--minibuffer-exited
@@ -343,6 +344,9 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   ;; at least the command that exited the minibuffer was used
   ;; in between (but `last-command' doesn't account for that).
   (setq keycast--command-repetitions -2))
+
+(defun keycast--pre-command-record ()
+  (setq keycast--pre-command this-command))
 
 (defun keycast--update ()
   (let ((key (this-single-command-keys))
@@ -466,10 +470,12 @@ t to show the actual COMMAND, or a symbol to be shown instead."
                  (throw 'found found)))))))
 
 (defun keycast--add-hooks ()
+  (add-hook 'pre-command-hook #'keycast--pre-command-record t)
   (add-hook 'post-command-hook #'keycast--update t)
   (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
 
 (defun keycast--remove-hooks ()
+  (remove-hook 'pre-command-hook #'keycast--pre-command-record t)
   (remove-hook 'post-command-hook #'keycast--update)
   (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit))
 
