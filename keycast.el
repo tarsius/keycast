@@ -350,7 +350,8 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defun keycast--update ()
   (let ((key (this-single-command-keys))
-        (cmd this-command))
+        (cmd (if (eq this-command keycast--pre-command) this-command
+               keycast--pre-command)))
     (when (and keycast--minibuffer-exited
                (or (not (equal key []))
                    (not (eq this-original-command 'execute-extended-command))))
