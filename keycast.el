@@ -469,6 +469,10 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   (add-hook 'post-command-hook #'keycast--update t)
   (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
 
+(defun keycast--remove-hooks ()
+  (remove-hook 'post-command-hook #'keycast--update)
+  (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit))
+
 ;;; Mode-Line
 
 (defvar keycast--mode-line-removed-tail nil)
@@ -522,8 +526,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
           (setq-local mode-line-format
                       (delq 'keycast-mode-line mode-line-format)))))
     (unless (keycast--mode-active-p)
-      (remove-hook 'post-command-hook #'keycast--update)
-      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
+      (keycast--remove-hooks)))))
 
 (defvar keycast-mode-line
   '(:eval
@@ -585,8 +588,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
             (setq header-line-format
                   (delq 'keycast-header-line header-line-format))))))
     (unless (keycast--mode-active-p)
-      (remove-hook 'post-command-hook #'keycast--update)
-      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
+      (keycast--remove-hooks)))))
 
 (defvar keycast-header-line
   '(:eval
@@ -649,8 +651,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
           (t
            (setq tab-bar-format (delq 'keycast-tab-bar tab-bar-format))))
     (unless (keycast--mode-active-p)
-      (remove-hook 'post-command-hook #'keycast--update)
-      (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)))))
+      (keycast--remove-hooks)))))
 
 (defun keycast-tab-bar ()
   "Produce key binding information for the tab bar."
@@ -674,8 +675,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
     (keycast-log--set-focus-properties t)
     (keycast-log-update-buffer))
    ((not (keycast--mode-active-p))
-    (remove-hook 'post-command-hook #'keycast--update)
-    (remove-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit)
+    (keycast--remove-hooks)
     (keycast-log--set-focus-properties nil))))
 
 (defun keycast-log-update-buffer ()
