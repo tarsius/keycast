@@ -465,6 +465,10 @@ t to show the actual COMMAND, or a symbol to be shown instead."
                (when-let ((found (keycast--tree-member elt sub)))
                  (throw 'found found)))))))
 
+(defun keycast--add-hooks ()
+  (add-hook 'post-command-hook #'keycast--update t)
+  (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
+
 ;;; Mode-Line
 
 (defvar keycast--mode-line-removed-tail nil)
@@ -497,8 +501,8 @@ t to show the actual COMMAND, or a symbol to be shown instead."
              (setcdr cons (list 'keycast-mode-line)))
             (t
              (setcdr cons (cl-pushnew 'keycast-mode-line (cdr cons)))))
-      (add-hook 'post-command-hook #'keycast--update t)
-      (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
+      (keycast--add-hooks)))
+
    (t
     (let ((cons (keycast--tree-member 'keycast-mode-line
                                       (default-value 'mode-line-format))))
@@ -559,8 +563,8 @@ t to show the actual COMMAND, or a symbol to be shown instead."
              (setcdr cons (list 'keycast-header-line)))
             (t
              (setcdr cons (cl-pushnew 'keycast-header-line (cdr cons)))))
-      (add-hook 'post-command-hook #'keycast--update t)
-      (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)))
+      (keycast--add-hooks)))
+
    (t
     (let ((cons (keycast--tree-member 'keycast-header-line
                                       (default-value 'header-line-format))))
@@ -634,8 +638,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
                           (message "%s not found in %s; adding at end instead"
                                    keycast-tab-bar-location 'tab-bar-format)
                           (list 'keycast-tab-bar))))))))
-    (add-hook 'post-command-hook #'keycast--update t)
-    (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t))
+    (keycast--add-hooks))
    (t
     (when keycast--temporary-tab-bar
       (setq keycast--temporary-tab-bar nil)
@@ -667,8 +670,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
   :global t
   (cond
    (keycast-log-mode
-    (add-hook 'post-command-hook #'keycast--update t)
-    (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
+    (keycast--add-hooks)
     (keycast-log--set-focus-properties t)
     (keycast-log-update-buffer))
    ((not (keycast--mode-active-p))
