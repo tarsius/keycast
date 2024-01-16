@@ -378,6 +378,13 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defun keycast--update ()
   (let ((key (this-single-command-keys))
         (cmd this-command))
+    ;; If a valid but incomplete prefix sequence is followed by
+    ;; an unbound key, then Emacs calls the `undefined' command
+    ;; but does not set `this-command', which is nil instead.
+    (when (and (not cmd)
+               (>= (length key) 1)
+               (eq (aref key (1- (length key))) ?\C-g))
+      (setq cmd 'undefined))
     (cond
      ;; Special handling for `execute-extended-command'.
      ((eq this-original-command 'execute-extended-command)
