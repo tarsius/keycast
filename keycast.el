@@ -50,10 +50,38 @@
 (eval-when-compile (require 'subr-x))
 
 ;;; Options
+;;;; Common
 
 (defgroup keycast nil
   "Show the current command and its key binding in the mode line."
   :group 'applications)
+
+(defcustom keycast-show-minibuffer-exit-command 'log-only
+  "Whether to show the command that exited the minibuffer.
+
+If `log-only', the default, then show the command that exited the
+minibuffer in the log buffer, but in places where just the latest
+command is shown, show the command that used the minibuffer.
+
+This is the default because if you use, e.g., `find-file' once,
+then it is more reasonable to show
+
+  RET      minibuffer-complete-and-exit
+  x        self-insert-command x5
+  C-x C-f  find-file
+
+than this would be
+
+  C-x C-f  find-file
+  x        self-insert-command x5
+  C-x C-f  find-file
+
+Otherwise this has to be a boolean and its value applies to all
+Keycast modes."
+  :group 'keycast
+  :type '(choice (const :tag "Exiting command in log only" log-only)
+                 (const :tag "Exiting command everywhere" t)
+                 (const :tag "Using command everywhere" nil)))
 
 ;;;; Mode-Line
 
@@ -362,14 +390,11 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       (setq key (this-single-command-raw-keys)))
      (keycast--minibuffer-exited
       ;; 2. When the minibuffer is exited (unless it is aborted).
-      (setq key (car keycast--minibuffer-exited))
-      (setq cmd (cdr keycast--minibuffer-exited))))
-    (setq keycast--minibuffer-exited nil)
+      (when (eq keycast-show-minibuffer-exit-command t)
+        (setq key (car keycast--minibuffer-exited))
+        (setq cmd (cdr keycast--minibuffer-exited)))))
     (setq keycast--this-command-keys key)
-    (setq keycast--this-command-desc
-          (cond ((symbolp cmd) cmd)
-                ((eq (car-safe cmd) 'lambda) "<lambda>")
-                (t (format "<%s>" (type-of cmd)))))
+    (setq keycast--this-command-desc (keycast--format-command cmd))
     (if (or (eq last-command cmd)
             (< keycast--command-repetitions 0))
         (cl-incf keycast--command-repetitions)
@@ -386,9 +411,22 @@ t to show the actual COMMAND, or a symbol to be shown instead."
      'keycast--header-line-modified-buffers))
   (when (and keycast-log-mode
              (not keycast--reading-passwd))
-    (keycast-log-update-buffer))
+    (if (and keycast--minibuffer-exited
+             (eq keycast-show-minibuffer-exit-command 'log-only)
+             (not (eq this-original-command 'execute-extended-command)))
+        (let ((keycast--this-command-keys (car keycast--minibuffer-exited))
+              (keycast--this-command-desc (keycast--format-command
+                                           (cdr keycast--minibuffer-exited))))
+          (keycast-log-update-buffer))
+      (keycast-log-update-buffer)))
+  (setq keycast--minibuffer-exited nil)
   (when (keycast--mode-active-p 'line)
     (force-mode-line-update (minibufferp))))
+
+(defun keycast--format-command (cmd)
+  (cond ((symbolp cmd) cmd)
+        ((eq (car-safe cmd) 'lambda) "<lambda>")
+        (t (format "<%s>" (type-of cmd)))))
 
 (defun keycast--maybe-edit-local-format (format item record)
   (let ((value (buffer-local-value format (current-buffer))))
