@@ -520,8 +520,6 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defvar keycast--temporary-mode-line nil)
 (defvar keycast--mode-line-modified-buffers nil)
 
-(defalias 'keycast-mode 'keycast-mode-line-mode)
-
 ;;;###autoload
 (define-minor-mode keycast-mode-line-mode
   "Show current command and its key binding in the mode line."
