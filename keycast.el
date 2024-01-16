@@ -356,7 +356,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       (setq cmd (cdr keycast--minibuffer-exited)))
     (setq keycast--minibuffer-exited nil)
     (when (or
-           ;; If a command uses the minibuffer twice, then
+           ;; If a command uses the minibuffer, then
            ;; `post-command-hook' gets called twice (unless the
            ;; minibuffer is aborted).  This is the first call.
            (equal key [])
