@@ -77,7 +77,10 @@ than this would be
   C-x C-f  find-file
 
 Otherwise this has to be a boolean and its value applies to all
-Keycast modes."
+Keycast modes.
+
+`execute-extended-command' is not affected by this option.  For
+that \"M-x the-selected-command\" is displayed unconditionally."
   :group 'keycast
   :type '(choice (const :tag "Exiting command in log only" log-only)
                  (const :tag "Exiting command everywhere" t)
