@@ -347,23 +347,24 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defun keycast--update ()
   (let ((key (this-single-command-keys))
         (cmd this-command))
-    (when (and keycast--minibuffer-exited
-               (or (not (equal key []))
-                   (not (eq this-original-command 'execute-extended-command))))
-      ;; Show the command that exited the minibuffer instead of
-      ;; once more showing the command that used the minibuffer.
-      (setq key (car keycast--minibuffer-exited))
-      (setq cmd (cdr keycast--minibuffer-exited)))
-    (setq keycast--minibuffer-exited nil)
-    (when (or
-           ;; If a command uses the minibuffer, then
-           ;; `post-command-hook' gets called twice (unless the
-           ;; minibuffer is aborted).  This is the first call.
-           (equal key [])
-           ;; `execute-extended-command' intentionally corrupts
-           ;; the value returned by `this-single-command-keys'.
-           (eq (aref key 0) ?\M-x))
+    (cond
+     ;; Special handling for `execute-extended-command'.
+     ((eq this-original-command 'execute-extended-command)
+      ;; Instead of "M-x t h e - c o m m a n d RET", just use
+      ;; "M-x", because we follow that up with the command anyway.
+      (setq key [?\M-x]))
+     ;; If a command uses the minibuffer then `post-command-hook'
+     ;; gets called twice on behalf of that command:
+     ((equal key [])
+      ;; 1. When the minibuffer is entered.  The key is void in that
+      ;;    case, which allows us to detect that it is the first call,
+      ;;    but also means we have to get the actual key like this.
       (setq key (this-single-command-raw-keys)))
+     (keycast--minibuffer-exited
+      ;; 2. When the minibuffer is exited (unless it is aborted).
+      (setq key (car keycast--minibuffer-exited))
+      (setq cmd (cdr keycast--minibuffer-exited))))
+    (setq keycast--minibuffer-exited nil)
     (setq keycast--this-command-keys key)
     (setq keycast--this-command-desc
           (cond ((symbolp cmd) cmd)
