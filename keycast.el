@@ -366,6 +366,12 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defvar keycast--command-repetitions 0)
 (defvar keycast--reading-passwd nil)
 
+(defvar keycast--prefix-argument-commands
+  '(universal-argument
+    universal-argument-more
+    negative-argument
+    digit-argument))
+
 (defun keycast--minibuffer-exit ()
   (setq keycast--minibuffer-exited
         (cons (this-single-command-keys) this-command))
@@ -378,13 +384,19 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defun keycast--update ()
   (let ((key (this-single-command-keys))
         (cmd this-command))
-    ;; If a valid but incomplete prefix sequence is followed by
-    ;; an unbound key, then Emacs calls the `undefined' command
-    ;; but does not set `this-command', which is nil instead.
-    (when (and (not cmd)
-               (>= (length key) 1)
-               (eq (aref key (1- (length key))) ?\C-g))
-      (setq cmd 'undefined))
+    (cond
+     ((memq this-original-command keycast--prefix-argument-commands)
+      ;; These commands set `this-command' to `last-command', to
+      ;; prevent `last-command' being the prefix command, for the
+      ;; command that uses the prefix argument.
+      (setq cmd this-original-command))
+     ((and (not cmd)
+           (>= (length key) 1)
+           (eq (aref key (1- (length key))) ?\C-g))
+      ;; If a valid but incomplete prefix sequence is followed by
+      ;; an unbound key, then Emacs calls the `undefined' command
+      ;; but does not set `this-command', which is nil instead.
+      (setq cmd 'undefined)))
     (cond
      ;; Special handling for `execute-extended-command'.
      ((eq this-original-command 'execute-extended-command)
