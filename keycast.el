@@ -391,7 +391,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
       ;; command that uses the prefix argument.
       (setq cmd this-original-command))
      ((and (not cmd)
-           (>= (length key) 1)
+           (length> key 0)
            (eq (aref key (1- (length key))) ?\C-g))
       ;; If a valid but incomplete prefix sequence is followed by
       ;; an unbound key, then Emacs calls the `undefined' command
