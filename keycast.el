@@ -452,8 +452,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 
 (defun keycast--maybe-edit-local-format (format item record)
   (let ((value (buffer-local-value format (current-buffer))))
-    (unless (and (listp value)
-                 (memq item value))
+    (unless (keycast--tree-member item value)
       (set record (cons (current-buffer) (symbol-value record)))
       (set format (if (keycast--format-atom-p value)
                       (list "" item value)
