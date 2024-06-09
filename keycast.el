@@ -496,11 +496,11 @@ t to show the actual COMMAND, or a symbol to be shown instead."
                    (?r . ,r)
                    (?R . ,(propertize r 'face 'shadow)))))))))
 
-(defun keycast--read-passwd (fn prompt &optional confirm default)
+(define-advice read-passwd
+    (:around (fn prompt &optional confirm default) keycast)
+  "Suppress echoing keys while reading passwords."
   (let ((keycast--reading-passwd t))
     (funcall fn prompt confirm default)))
-
-(advice-add 'read-passwd :around #'keycast--read-passwd)
 
 (defun keycast-bottom-right-window-p ()
   (and (window-at-side-p nil 'right)
