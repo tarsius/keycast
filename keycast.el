@@ -520,7 +520,7 @@ t to show the actual COMMAND, or a symbol to be shown instead."
 (defun keycast--tree-member (elt tree &optional delete)
   ;; Also known as auto-compile--tree-member.
   (and (listp tree)
-       (if-let* ((pos (cl-position elt tree))
+       (if-let* ((pos (cl-position elt tree :test #'equal))
                  (mem (nthcdr pos tree)))
            (cond ((not delete) mem)
                  ((cdr mem)
