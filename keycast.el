@@ -309,7 +309,8 @@ event or a command.  When a command is invoked then this package
 looks for a MATCH for that.  If and only if there is no match for
 that, then it looks for a MATCH for its key binding.  If there is
 a match of either kind, then the respective EVENT and COMMAND are
-used.
+used.  Each MATCH has to be either a command (usually a symbol),
+or a key description (as per `key-valid-p').
 
 If either EVENT or COMMAND is nil, then neither the event nor the
 command is shown (regardless of the value of the other).
