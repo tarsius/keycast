@@ -1,0 +1,6 @@
+.dir-locals.el
+.elpaignore
+.github
+.gitignore
+LICENSE
+Makefile
